@@ -22,15 +22,15 @@ export async function startTelegramBot(): Promise<void> {
   ]);
   await bot.api.setMyDescription(
     [
-      "Vexora Games — мини-игры вокруг коллекционных NFT-подарков Telegram.",
+      "Vexora Games — игровая вселенная коллекционных Telegram-подарков.",
       "",
-      "Открывай подарочные кейсы, запускай Rocket, исследуй Mines, улучшай коллекцию и поднимайся в рейтинге.",
+      "Открывай кейсы, запускай Rocket, исследуй Mines и Roulette, собирай редкие подарки и развивай свою коллекцию.",
       "",
-      "Сейчас доступен демонстрационный режим без ставок и реальных денег.",
+      "Участвуй в ежедневных активностях, поднимайся в рейтинге и следи за появлением новых игровых режимов.",
     ].join("\n"),
   );
   await bot.api.setMyShortDescription(
-    "Мини-игры, кейсы и коллекция NFT-подарков Telegram.",
+    "Telegram Gifts, кейсы, Rocket, Mines, Roulette и твоя коллекция.",
   );
   await bot.api.setChatMenuButton({
     menu_button: {
