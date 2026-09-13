@@ -254,17 +254,19 @@ export default function RocketGame() {
   const trajectoryPath = buildTrajectoryPath(flightProgress);
   const currentTrajectoryPoint = trajectoryPoint(flightProgress);
   const previousPoint = trajectoryPoint(loopState.current.previousProgress);
-  const tangentAngle = Math.atan2(
+  const angle = Math.atan2(
     currentTrajectoryPoint.y - previousPoint.y,
     currentTrajectoryPoint.x - previousPoint.x,
-  ) * (180 / Math.PI);
+  ) + Math.PI / 2;
   const animationSeconds = visualTime / 1000;
   const idleRotation = Math.sin(loopState.current.idleT) * 0.1 * (180 / Math.PI);
   const idleOffsetY = Math.sin(loopState.current.idleT * 1.3) * 6;
-  const flightWobble = Math.sin(animationSeconds * ((Math.PI * 2) / 1.45)) * 3;
+  const flightWobble = Math.sin(visualTime * 0.006) * 0.06;
   const rocketLeft = phase === 'betting' ? 50 : (currentTrajectoryPoint.x / width) * 100;
   const rocketTop = phase === 'betting' ? 34 : (currentTrajectoryPoint.y / height) * 100;
-  const rocketRotation = phase === 'betting' ? idleRotation : tangentAngle + 47 + flightWobble;
+  const rocketRotation = phase === 'betting'
+    ? idleRotation
+    : (angle + flightWobble) * (180 / Math.PI);
   const rocketOffsetY = phase === 'betting' ? idleOffsetY : 0;
   const countdownValue = Math.max(1, Math.ceil(timeLeft));
   const countdownProgress = Math.max(0, Math.min(1, timeLeft / 5));
