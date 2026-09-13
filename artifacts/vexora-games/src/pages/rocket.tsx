@@ -10,24 +10,21 @@ import { MOCK_NFTS } from '@/App';
 const DEMO_NAMES = ["Lucius", "KAIR...", "meryem", "Alex", "0x...", "Doge", "CryptoKing", "VexFan", "Satoshi", "Whale"];
 type Phase = 'betting' | 'flying' | 'crashed';
 
-const SCENE_WIDTH = 400;
-const SCENE_HEIGHT = 300;
+const width = 400;
+const height = 300;
 
-function easeOutExpo(progress: number) {
-  if (progress <= 0) return 0;
-  if (progress >= 1) return 1;
-  return 1 - Math.pow(2, -10 * progress);
+function easeOutExpo(p: number) {
+  if (p <= 0) return 0;
+  if (p >= 1) return 1;
+  return 1 - Math.pow(2, -10 * p);
 }
 
-function getTrajectoryPoint(progress: number) {
-  const p = Math.max(0, Math.min(1, progress));
-  const startX = SCENE_WIDTH * 0.05;
-  const startY = SCENE_HEIGHT * 0.78;
-  const endX = SCENE_WIDTH * 0.95;
-  const endY = SCENE_HEIGHT * 0.08;
+function trajectoryPoint(p: number) {
+  const startX = width * 0.05, startY = height * 0.78;
+  const endX = width * 0.95, endY = height * 0.08;
   return {
     x: startX + (endX - startX) * p,
-    y: startY + (endY - startY) * easeOutExpo(p),
+    y: startY + (endY - startY) * easeOutExpo(p)
   };
 }
 
@@ -35,7 +32,7 @@ function buildTrajectoryPath(progress: number) {
   if (progress <= 0) return '';
   const steps = Math.max(2, Math.ceil(progress * 64));
   return Array.from({ length: steps + 1 }, (_, index) => {
-    const point = getTrajectoryPoint(progress * (index / steps));
+    const point = trajectoryPoint(progress * (index / steps));
     return `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
   }).join(' ');
 }
@@ -249,18 +246,18 @@ export default function RocketGame() {
   const selectedNft = MOCK_NFTS.find(n => n.id === selectedNftId);
   const flightProgress = phase === 'betting' ? 0 : loopState.current.currentProgress;
   const trajectoryPath = buildTrajectoryPath(flightProgress);
-  const trajectoryPoint = getTrajectoryPoint(flightProgress);
-  const previousPoint = getTrajectoryPoint(Math.max(0, flightProgress - 0.003));
+  const currentTrajectoryPoint = trajectoryPoint(flightProgress);
+  const previousPoint = trajectoryPoint(Math.max(0, flightProgress - 0.003));
   const tangentAngle = Math.atan2(
-    trajectoryPoint.y - previousPoint.y,
-    trajectoryPoint.x - previousPoint.x,
+    currentTrajectoryPoint.y - previousPoint.y,
+    currentTrajectoryPoint.x - previousPoint.x,
   ) * (180 / Math.PI);
   const animationSeconds = visualTime / 1000;
   const idleRotation = Math.sin(animationSeconds * Math.PI) * 6;
   const idleOffsetY = Math.sin(animationSeconds * ((Math.PI * 2) / 1.7)) * 5;
   const flightWobble = Math.sin(animationSeconds * ((Math.PI * 2) / 1.45)) * 3;
-  const rocketLeft = phase === 'betting' ? 50 : (trajectoryPoint.x / SCENE_WIDTH) * 100;
-  const rocketTop = phase === 'betting' ? 34 : (trajectoryPoint.y / SCENE_HEIGHT) * 100;
+  const rocketLeft = phase === 'betting' ? 50 : (currentTrajectoryPoint.x / width) * 100;
+  const rocketTop = phase === 'betting' ? 34 : (currentTrajectoryPoint.y / height) * 100;
   const rocketRotation = phase === 'betting' ? idleRotation : tangentAngle + 47 + flightWobble;
   const rocketOffsetY = phase === 'betting' ? idleOffsetY : 0;
   const countdownValue = Math.max(1, Math.ceil(timeLeft));
