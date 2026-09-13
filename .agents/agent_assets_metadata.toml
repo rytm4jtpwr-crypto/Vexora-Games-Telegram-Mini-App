@@ -42,3 +42,17 @@ mtime_ms = 1789315512495
 storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/9679b0cb-9c9f-40b3-a8a4-e8ae011c44f6/b68f3586-7870-4e8e-b293-a261f8e68505"
 storage_version_token = "1789315545267252"
 content_type = "image/png"
+
+[[outputs]]
+id = "paBbvvnIw-3tWL2lk3SZU"
+uri = "file://attached_assets/generated_images/vexora-games-nft-rocket-roulette-profile.png"
+type = "image"
+title = "Vexora Games — NFT, Rocket и рулетка"
+description = "Итоговая квадратная обложка: пять ваших NFT-подарков, Rocket, рулетка, Mines и кейс. Готова для загрузки в BotFather."
+logical_id = "0e7ac09d-2090-4aef-bc8e-ffbae6b9244e"
+content_hash = "sha256:f68b1f9230693ae2ec352a642dbfa13b278f9238563f0bbc0181a0051e6c9a8b"
+size = 1571702
+mtime_ms = 1789315615150
+storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/0e7ac09d-2090-4aef-bc8e-ffbae6b9244e/b1a9c448-7c12-4cba-99f1-dfaeeb1e916f"
+storage_version_token = "1789315632385191"
+content_type = "image/png"
