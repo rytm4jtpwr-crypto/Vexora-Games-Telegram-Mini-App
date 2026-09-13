@@ -155,7 +155,7 @@ export default function RocketGame() {
             loopState.current.timeLeft = 5.0;
             setPhase('betting');
             resetRound();
-          }, 3000);
+          }, 4500);
         } else {
           setMultiplier(currentM);
           
@@ -306,30 +306,20 @@ export default function RocketGame() {
             className={`rocket-vehicle absolute z-20 ${phase === 'flying' ? 'is-flying' : ''} ${phase === 'crashed' ? 'is-crashed' : ''}`}
             style={{ left: `${rocketLeft}%`, top: `${rocketTop}%` }}
           >
+            <div className="rocket-smoke-trail" aria-hidden="true">
+              {Array.from({ length: 7 }, (_, index) => <span key={index} style={{ '--smoke-index': index } as CSSProperties} />)}
+            </div>
             <div className="rocket-engine-glow" />
             <div className="rocket-flame" />
             <div className="rocket-shell">
               <div className="rocket-rider">
                 {selectedNftId === 4 ? (
-                  <>
-                    <img src="/assets/plush-pepe-rider.png" alt="Plush Pepe летит на ракете" />
-                    <span className="pepe-waving-arm" aria-hidden="true" />
-                  </>
+                  <img src="/assets/plush-pepe-animated-rider.png" alt="Plush Pepe сидит верхом на ракете и машет рукой" />
                 ) : selectedNft ? (
                   <img src={selectedNft.image} alt={`${selectedNft.name} летит на ракете`} />
                 ) : null}
               </div>
-              <div className="rocket-3d-model" aria-hidden="true">
-                <span className="rocket-3d-nose" />
-                <span className="rocket-3d-body">
-                  <i className="rocket-3d-highlight" />
-                  <i className="rocket-3d-window" />
-                  <i className="rocket-3d-band" />
-                </span>
-                <span className="rocket-3d-fin fin-top" />
-                <span className="rocket-3d-fin fin-bottom" />
-                <span className="rocket-3d-engine" />
-              </div>
+              <img className="rocket-model-image" src="/assets/neon-rocket-model.png" alt="" aria-hidden="true" />
             </div>
             {phase === 'crashed' && (
               <div className="rocket-explosion" aria-label="Ракета остановилась">
