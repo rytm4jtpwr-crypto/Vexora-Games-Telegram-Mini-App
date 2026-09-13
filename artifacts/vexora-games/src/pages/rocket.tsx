@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
-import { ChevronLeft, Gift, Diamond, Rocket, Users, ShieldAlert } from 'lucide-react';
+import { ChevronLeft, Gift, Diamond, Rocket, Users, ShieldAlert, X, Gauge, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -56,6 +56,7 @@ export default function RocketGame() {
   
   const [selectedNftId, setSelectedNftId] = useState<number | null>(null);
   const [isGiftSelectorOpen, setIsGiftSelectorOpen] = useState(false);
+  const [isBetDialogOpen, setIsBetDialogOpen] = useState(false);
 
   // Refs for Game Loop to avoid stale closures
   const gameLoopRef = useRef<number | null>(null);
@@ -139,7 +140,8 @@ export default function RocketGame() {
         }
       } else if (loopState.current.phase === 'flying') {
         const elapsed = (time - loopState.current.flightStartTime) / 1000;
-        const currentM = Math.pow(Math.E, elapsed * 0.1);
+        // Starts gently, then accelerates as the quadratic term grows.
+        const currentM = Math.exp((elapsed * 0.06) + (elapsed * elapsed * 0.012));
 
         if (currentM >= loopState.current.crashPoint) {
           loopState.current.phase = 'crashed';
@@ -185,21 +187,21 @@ export default function RocketGame() {
     };
   }, []);
 
-  const handlePlaceBet = (): void => {
+  const handlePlaceBet = (): boolean => {
     const amt = Number(betAmount);
     if (isNaN(amt) || amt <= 0) {
       toast({ description: "Неверная сумма", variant: "destructive" });
-      return;
+      return false;
     }
     if (amt > balance) {
       toast({ description: "Недостаточно VEX", variant: "destructive" });
-      return;
+      return false;
     }
     if (isAutoCashoutEnabled) {
       const target = Number(autoCashout);
       if (!Number.isFinite(target) || target < 1.01 || target > 99.99) {
         toast({ description: "Автовывод должен быть от 1.01x до 99.99x", variant: "destructive" });
-        return;
+        return false;
       }
     }
     
@@ -207,6 +209,7 @@ export default function RocketGame() {
     setStakedAmount(amt);
     setIsCashedOut(false);
     setWinAmount(0);
+    return true;
   };
 
   const handleCancelBet = () => {
@@ -215,6 +218,11 @@ export default function RocketGame() {
   };
 
   const selectedNft = MOCK_NFTS.find(n => n.id === selectedNftId);
+  const flightProgress = phase === 'betting'
+    ? 0
+    : Math.min(1, Math.pow(Math.log(Math.max(multiplier, 1)) / Math.log(100), 1.35));
+  const rocketLeft = 13 + flightProgress * 72;
+  const rocketTop = 79 - flightProgress * 65;
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background text-foreground overflow-hidden">
@@ -267,7 +275,7 @@ export default function RocketGame() {
 
       <main className="flex-1 overflow-y-auto hide-scrollbar flex flex-col">
         {/* Graph Area */}
-        <div className="relative h-[280px] w-full bg-[#111118] shrink-0 overflow-hidden border-b border-border/50 shadow-inner">
+        <div className={`rocket-stage relative h-[300px] w-full shrink-0 overflow-hidden border-b border-border/50 shadow-inner phase-${phase}`}>
           
           {phase === 'flying' && (
             PARTICLES.map((particle) => (
@@ -280,30 +288,46 @@ export default function RocketGame() {
             ))
           )}
 
-          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-80" preserveAspectRatio="none">
+          <div className="rocket-aurora" />
+          <div className="rocket-stars" />
+
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
             <path 
               d="M -50,350 Q 150,280 450,-50" 
               fill="none" 
               stroke={phase === 'crashed' ? "hsl(0 85% 60%)" : "hsl(45 95% 55%)"} 
-              strokeWidth="5" 
-              className={`transition-colors duration-300 ${phase === 'crashed' ? "drop-shadow-[0_0_12px_rgba(239,68,68,0.8)]" : "drop-shadow-[0_0_12px_rgba(234,179,8,0.8)]"}`} 
+              strokeWidth="7"
+              strokeLinecap="round"
+              className={`rocket-trajectory transition-colors duration-300 ${phase === 'crashed' ? "drop-shadow-[0_0_20px_rgba(239,68,68,1)]" : "drop-shadow-[0_0_22px_rgba(250,204,21,1)]"}`}
             />
           </svg>
 
-          <div className={`absolute z-10 top-[45%] left-[55%] -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ${
-            phase === 'crashed' ? 'grayscale opacity-50 scale-75 translate-y-[20px]' : 
-            phase === 'flying' ? 'animate-pulse drop-shadow-[0_0_25px_rgba(255,255,255,0.3)] scale-110' : ''
-          }`}>
-            {selectedNft ? (
-              <img src={selectedNft.image} className="w-24 h-24 object-contain -rotate-12" alt="" />
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm flex items-center justify-center">
-                <Rocket size={64} strokeWidth={1.8} className="text-white rotate-45 drop-shadow-[0_0_14px_rgba(255,255,255,0.8)]" />
+          <div
+            className={`rocket-vehicle absolute z-20 ${phase === 'flying' ? 'is-flying' : ''} ${phase === 'crashed' ? 'is-crashed' : ''}`}
+            style={{ left: `${rocketLeft}%`, top: `${rocketTop}%` }}
+          >
+            <div className="rocket-engine-glow" />
+            <div className="rocket-flame" />
+            <div className="rocket-shell">
+              {selectedNft ? (
+                <img src={selectedNft.image} className="w-20 h-20 object-contain -rotate-12 drop-shadow-[0_0_20px_rgba(255,255,255,0.9)]" alt={selectedNft.name} />
+              ) : (
+                <Rocket size={68} strokeWidth={2} className="text-white rotate-45 drop-shadow-[0_0_16px_rgba(255,255,255,1)]" />
+              )}
+            </div>
+            {phase === 'crashed' && (
+              <div className="rocket-explosion" aria-label="Ракета остановилась">
+                <span className="explosion-core" />
+                <span className="explosion-ring ring-one" />
+                <span className="explosion-ring ring-two" />
+                {Array.from({ length: 12 }, (_, index) => (
+                  <i key={index} style={{ '--spark-angle': `${index * 30}deg` } as CSSProperties} />
+                ))}
               </div>
             )}
           </div>
           
-          <div className="absolute top-[35%] left-[30%] -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
+          <div className="absolute top-[33%] left-[27%] -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center">
             {phase === 'betting' ? (
               <div className="text-center animate-pop-in">
                 <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Ожидание</div>
@@ -334,19 +358,13 @@ export default function RocketGame() {
         {/* Controls */}
         <div className="p-4 bg-background shrink-0">
           <div className="flex gap-3 mb-4">
-            <div className="flex-[3] bg-card rounded-2xl p-1.5 flex border border-border focus-within:border-primary/50 transition-colors shadow-sm">
-              <Input 
-                type="number" 
-                min="1"
-                max={balance}
-                value={betAmount} 
-                onChange={e => setBetAmount(e.target.value)}
-                disabled={phase !== 'betting' || stakedAmount > 0}
-                className="border-0 bg-transparent shadow-none focus-visible:ring-0 text-xl font-bold font-mono h-full"
-              />
-              <div className="flex flex-col gap-1 p-1">
-                <Button variant="secondary" size="icon" className="h-7 w-8 rounded-lg text-xs font-bold bg-background" onClick={() => setBetAmount(String(Number(betAmount) * 2))} disabled={phase !== 'betting' || stakedAmount > 0}>x2</Button>
-                <Button variant="secondary" size="icon" className="h-7 w-8 rounded-lg text-xs font-bold bg-background" onClick={() => setBetAmount(String(Math.floor(Number(betAmount) / 2)))} disabled={phase !== 'betting' || stakedAmount > 0}>/2</Button>
+            <div className="flex-[3] bg-card rounded-2xl p-3 flex items-center gap-3 border border-border shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+                <Diamond size={18} className="text-primary" />
+              </div>
+              <div>
+                <p className="text-[0.6rem] text-muted-foreground uppercase font-black tracking-wider">Сумма ставки</p>
+                <p className="text-xl font-black font-mono">{stakedAmount > 0 ? stakedAmount : betAmount} VEX</p>
               </div>
             </div>
             
@@ -383,7 +401,7 @@ export default function RocketGame() {
             onClick={() => {
               if (phase === 'betting') {
                 if (stakedAmount > 0) handleCancelBet();
-                else handlePlaceBet();
+                else setIsBetDialogOpen(true);
               } else if (phase === 'flying') {
                 if (stakedAmount > 0 && !isCashedOut) {
                   playerRef.current.handleCashOut(multiplier);
@@ -481,6 +499,69 @@ export default function RocketGame() {
             </div>
             <div className="p-4 bg-secondary/20 text-center">
               <p className="text-[10px] text-muted-foreground">Gift отображается в полёте и никогда не списывается.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isBetDialogOpen && (
+        <div className="fixed inset-0 z-[110] bg-black/75 backdrop-blur-md flex items-end sm:items-center justify-center p-3 animate-pop-in">
+          <div className="bet-dialog bg-card w-full max-w-sm rounded-[1.75rem] border border-primary/25 shadow-[0_0_50px_rgba(139,92,246,0.25)] overflow-hidden">
+            <div className="p-5 flex items-start justify-between border-b border-border/60">
+              <div>
+                <p className="text-[0.65rem] text-primary uppercase tracking-[0.2em] font-black mb-1">Rocket</p>
+                <h2 className="text-xl font-black">Укажите сумму ставки</h2>
+                <p className="text-xs text-muted-foreground mt-1">Доступно {balance.toLocaleString()} VEX</p>
+              </div>
+              <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setIsBetDialogOpen(false)} aria-label="Закрыть">
+                <X size={18} />
+              </Button>
+            </div>
+
+            <div className="p-5">
+              <div className="relative">
+                <Diamond className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" size={20} />
+                <Input
+                  autoFocus
+                  type="number"
+                  inputMode="numeric"
+                  min="1"
+                  max={balance}
+                  value={betAmount}
+                  onChange={(event) => setBetAmount(event.target.value)}
+                  className="h-16 rounded-2xl bg-background border-primary/20 pl-12 pr-16 text-2xl font-black font-mono focus-visible:ring-primary"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-muted-foreground">VEX</span>
+              </div>
+
+              <div className="grid grid-cols-4 gap-2 mt-3">
+                {[10, 50, 100, 500].map((amount) => (
+                  <button
+                    key={amount}
+                    onClick={() => setBetAmount(String(Math.min(amount, balance)))}
+                    className="h-10 rounded-xl bg-secondary hover:bg-primary/20 border border-border text-sm font-black transition-colors"
+                  >
+                    {amount}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 mt-4 text-[0.65rem] text-muted-foreground">
+                <Gauge size={14} className="text-primary shrink-0" />
+                <span>После подтверждения ставку можно отменить до старта.</span>
+              </div>
+
+              <Button
+                className="w-full h-14 mt-5 rounded-2xl bg-primary hover:bg-primary/90 text-base font-black uppercase tracking-wider"
+                onClick={() => {
+                  if (handlePlaceBet()) {
+                    setIsBetDialogOpen(false);
+                  }
+                }}
+              >
+                <Check size={19} />
+                Подтвердить ставку
+              </Button>
             </div>
           </div>
         </div>
