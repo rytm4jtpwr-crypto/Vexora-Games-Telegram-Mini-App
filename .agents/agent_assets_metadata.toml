@@ -98,3 +98,17 @@ mtime_ms = 1789316216771
 storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/d8587961-329a-4ee3-ac21-916ccdee5630/4d17a91d-10b1-467e-ac25-4db35c2f4361"
 storage_version_token = "1789316231137846"
 content_type = "image/png"
+
+[[outputs]]
+id = "eUHFwr6ccvXJVxVUmekrb"
+uri = "file://attached_assets/generated_images/vexora-blue-hood-avatar.png"
+type = "image"
+title = "VEXORA GAMES — синий аватар"
+description = "Готовый квадратный аватар в стиле исходного изображения с точными надписями VEXORA и GAMES."
+logical_id = "52c3166f-ac53-4f65-859b-d42855b057c4"
+content_hash = "sha256:611208bf266251ae0f00ffb072669366174c6549fe845d2924d5348205ea2f62"
+size = 1543890
+mtime_ms = 1789318543074
+storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/52c3166f-ac53-4f65-859b-d42855b057c4/2d588fa9-ee1d-425d-bb1d-2df6439efe50"
+storage_version_token = "1789318555210984"
+content_type = "image/png"

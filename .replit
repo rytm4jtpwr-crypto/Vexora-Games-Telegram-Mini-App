@@ -32,3 +32,15 @@ TELEGRAM_BOT_MODE = "polling"
 
 [userenv.production]
 TELEGRAM_BOT_MODE = "webhook"
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
+
+[[ports]]
+localPort = 19381
+externalPort = 80
