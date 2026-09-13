@@ -716,15 +716,31 @@
 
 .rocket-crash-particle {
   position: absolute;
-  left: 50%;
-  top: 50%;
   width: 6px;
   height: 6px;
-  margin: -3px;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
   background: #fb923c;
   box-shadow: 0 0 8px #fb923c;
-  will-change: transform, opacity;
+  will-change: left, top, opacity;
+}
+
+.rocket-particle-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.rocket-engine-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 6px #fbbf24;
+  will-change: left, top, opacity;
 }
 
 .explosion-burst {
@@ -814,28 +830,6 @@
   transform: rotate(-17deg);
   opacity: calc(.8 + .2 * var(--flame-pulse, 1));
   animation: attached-flame-flicker .12s steps(2, end) infinite;
-}
-
-.rocket-emitter {
-  position: absolute;
-  z-index: 1;
-  left: 19px;
-  top: 88px;
-  width: 1px;
-  height: 1px;
-  pointer-events: none;
-}
-
-.rocket-emitter span {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #fff6c9;
-  box-shadow: 0 0 6px #ff9f70;
-  will-change: transform, opacity;
 }
 
 .rocket-readout.is-countdown {

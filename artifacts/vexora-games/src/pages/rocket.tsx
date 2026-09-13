@@ -46,6 +46,15 @@ interface DemoUser {
   avatar: string;
 }
 
+interface RocketParticle {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+}
+
 function getCrashPoint() {
   const r = Math.random();
   if (r < 0.03) return 1.00;
@@ -64,6 +73,8 @@ export default function RocketGame() {
   const [visualTime, setVisualTime] = useState(0);
   const [history, setHistory] = useState<number[]>([1.53, 2.40, 1.10, 5.92, 15.74]);
   const [demoUsers, setDemoUsers] = useState<DemoUser[]>([]);
+  const [engineParticles, setEngineParticles] = useState<RocketParticle[]>([]);
+  const [crashParticles, setCrashParticles] = useState<RocketParticle[]>([]);
 
   // Player State
   const [balance, setBalance] = useState(() => Number(localStorage.getItem('vexora_balance') || 10240));
@@ -92,6 +103,9 @@ export default function RocketGame() {
     crashStartTime: 0,
   });
   const demoUsersRef = useRef<DemoUser[]>([]);
+  const engineParticlesRef = useRef<RocketParticle[]>([]);
+  const crashParticlesRef = useRef<RocketParticle[]>([]);
+  const particleIdRef = useRef(0);
   const playerRef = useRef({
     stakedAmount: 0,
     isCashedOut: false,
@@ -162,6 +176,10 @@ export default function RocketGame() {
           loopState.current.flightStartTime = time;
           loopState.current.previousProgress = 0;
           loopState.current.currentProgress = 0;
+          engineParticlesRef.current = [];
+          crashParticlesRef.current = [];
+          setEngineParticles([]);
+          setCrashParticles([]);
           setPhase('flying');
           setMultiplier(1.00);
           generateDemoUsers();
@@ -171,12 +189,28 @@ export default function RocketGame() {
         const progress = Math.min(1, 1 - 1 / (1 + elapsed * 0.35));
         loopState.current.previousProgress = loopState.current.currentProgress;
         loopState.current.currentProgress = progress;
+        const point = trajectoryPoint(progress);
         // Starts gently, then accelerates as the quadratic term grows.
         const currentM = Math.exp((elapsed * 0.06) + (elapsed * elapsed * 0.012));
 
         if (currentM >= loopState.current.crashPoint) {
           loopState.current.phase = 'crashed';
           loopState.current.crashStartTime = time;
+          engineParticlesRef.current = [];
+          setEngineParticles([]);
+          crashParticlesRef.current = Array.from({ length: 24 }, () => {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 6 + 2;
+            return {
+              id: particleIdRef.current++,
+              x: point.x,
+              y: point.y,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed,
+              life: 1,
+            };
+          });
+          setCrashParticles([...crashParticlesRef.current]);
           const finalM = loopState.current.crashPoint;
           setMultiplier(finalM);
           setPhase('crashed');
@@ -190,6 +224,26 @@ export default function RocketGame() {
           }, 4500);
         } else {
           setMultiplier(currentM);
+
+          if (Math.random() < 0.6) {
+            engineParticlesRef.current.push({
+              id: particleIdRef.current++,
+              x: point.x,
+              y: point.y,
+              vx: (Math.random() - 0.5) * 1.5,
+              vy: Math.random() * 1.5 + 1,
+              life: 1,
+            });
+          }
+          engineParticlesRef.current.forEach((particle) => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.life -= 0.03;
+          });
+          engineParticlesRef.current = engineParticlesRef.current.filter(
+            (particle) => particle.life > 0,
+          );
+          setEngineParticles([...engineParticlesRef.current]);
           
           if (playerRef.current.stakedAmount > 0 && 
               !playerRef.current.isCashedOut && 
@@ -209,6 +263,17 @@ export default function RocketGame() {
             setDemoUsers([...demoUsersRef.current]);
           }
         }
+      } else if (loopState.current.phase === 'crashed') {
+        crashParticlesRef.current.forEach((particle) => {
+          particle.x += particle.vx;
+          particle.y += particle.vy;
+          particle.vy += 0.15;
+          particle.life -= 0.02;
+        });
+        crashParticlesRef.current = crashParticlesRef.current.filter(
+          (particle) => particle.life > 0,
+        );
+        setCrashParticles([...crashParticlesRef.current]);
       }
       gameLoopRef.current = requestAnimationFrame(tick);
     };
@@ -258,7 +323,6 @@ export default function RocketGame() {
     currentTrajectoryPoint.y - previousPoint.y,
     currentTrajectoryPoint.x - previousPoint.x,
   ) + Math.PI / 2;
-  const animationSeconds = visualTime / 1000;
   const idleRotation = Math.sin(loopState.current.idleT) * 0.1 * (180 / Math.PI);
   const idleOffsetY = Math.sin(loopState.current.idleT * 1.3) * 6;
   const flightWobble = Math.sin(visualTime * 0.006) * 0.06;
@@ -271,10 +335,6 @@ export default function RocketGame() {
   const countdownValue = Math.max(1, Math.ceil(timeLeft));
   const countdownProgress = Math.max(0, Math.min(1, timeLeft / 5));
   const showCenteredMultiplier = phase === 'crashed' || (phase === 'flying' && rocketTop < 7);
-  const crashAge = phase === 'crashed'
-    ? Math.max(0, (visualTime - loopState.current.crashStartTime) / 1000)
-    : 0;
-
   return (
     <div className="flex flex-col h-[100dvh] bg-background text-foreground overflow-hidden">
       <style>{`
@@ -336,7 +396,7 @@ export default function RocketGame() {
               <path
                 d={trajectoryPath}
                 fill="none"
-                stroke={phase === 'crashed' ? "#ff325f" : "#786cff"}
+                stroke={phase === 'crashed' ? "rgba(239,68,68,0.8)" : "#786cff"}
                 strokeWidth="5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -344,6 +404,31 @@ export default function RocketGame() {
               />
             )}
           </svg>
+
+          <div className="rocket-particle-layer" aria-hidden="true">
+            {engineParticles.map((particle) => (
+              <span
+                key={particle.id}
+                className="rocket-engine-particle"
+                style={{
+                  left: `${(particle.x / width) * 100}%`,
+                  top: `${(particle.y / height) * 100}%`,
+                  opacity: particle.life,
+                }}
+              />
+            ))}
+            {crashParticles.map((particle) => (
+              <span
+                key={particle.id}
+                className="rocket-crash-particle"
+                style={{
+                  left: `${(particle.x / width) * 100}%`,
+                  top: `${(particle.y / height) * 100}%`,
+                  opacity: particle.life,
+                }}
+              />
+            ))}
+          </div>
 
           <div
             className={`rocket-vehicle absolute z-20 ${phase === 'flying' ? 'is-flying' : ''} ${phase === 'crashed' ? 'is-crashed' : ''}`}
@@ -357,43 +442,8 @@ export default function RocketGame() {
               <span className="rocket-attached-flame" aria-hidden="true" />
               <img className="rocket-model-image" src="/assets/neon-rocket-model.png" alt="Неоновая ракета Vexora" />
             </div>
-            {phase === 'flying' && (
-              <div className="rocket-emitter" aria-hidden="true">
-                {Array.from({ length: 12 }, (_, index) => {
-                  const lifetime = 0.4 + (index % 4) * 0.065;
-                  const age = ((animationSeconds + index * 0.071) % lifetime) / lifetime;
-                  const spread = Math.sin(index * 2.31) * 13 * age;
-                  const travel = 12 + age * 46;
-                  return (
-                    <span
-                      key={index}
-                      style={{
-                        opacity: Math.max(0, 1 - age),
-                        transform: `translate(${-travel}px, ${spread}px) scale(${Math.max(0.15, 1 - age * 0.8)})`,
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            )}
             {phase === 'crashed' && (
               <div className="rocket-explosion" aria-label="Ракета остановилась">
-                {Array.from({ length: 24 }, (_, index) => {
-                  const angle = (index / 24) * Math.PI * 2;
-                  const speed = 2 + ((index * 17) % 40) / 10;
-                  const x = Math.cos(angle) * speed * crashAge * 34;
-                  const y = (Math.sin(angle) * speed * crashAge + crashAge * crashAge * 1.8) * 34;
-                  return (
-                    <i
-                      key={index}
-                      className="rocket-crash-particle"
-                      style={{
-                        opacity: Math.max(0, 1 - crashAge / 1.4),
-                        transform: `translate(${x}px, ${y}px) scale(${Math.max(0.2, 1 - crashAge * 0.55)})`,
-                      }}
-                    />
-                  );
-                })}
               </div>
             )}
           </div>
