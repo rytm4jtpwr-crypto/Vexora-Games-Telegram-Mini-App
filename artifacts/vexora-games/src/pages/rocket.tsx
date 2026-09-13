@@ -397,7 +397,7 @@ export default function RocketGame() {
                 d={trajectoryPath}
                 fill="none"
                 stroke={phase === 'crashed' ? "rgba(239,68,68,0.8)" : "#786cff"}
-                strokeWidth="5"
+                strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="rocket-trajectory"
