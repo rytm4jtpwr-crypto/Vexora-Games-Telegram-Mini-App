@@ -1,0 +1,30 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "EsJ2ocDmM93pRu2CMJH2L"
+uri = "file://attached_assets/generated_images/vexora-games-telegram-profile.png"
+type = "image"
+title = "Аватар Vexora Games для Telegram"
+description = "Квадратное изображение 1024×1024, подготовленное для загрузки через BotFather. Центральная композиция подходит для круглого кадрирования Telegram."
+logical_id = "93072178-de76-4b9f-b3ab-48afbbb6903f"
+content_hash = "sha256:a33d2c6fc1ef63fd627da93f7189f1823a30754d07cc6e7a90de408627ee1c6a"
+size = 1669141
+mtime_ms = 1789314907812
+storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/93072178-de76-4b9f-b3ab-48afbbb6903f/43b3f635-3f84-4ffe-96c4-fef22c0db9be"
+storage_version_token = "1789314954647432"
+content_type = "image/png"
+
+[[outputs]]
+id = "XXFFxAPlonLW0Vkk21BA0"
+uri = "file://attached_assets/generated_images/vexora-games-telegram-gifts-profile.png"
+type = "image"
+title = "Vexora Games — Telegram Gifts"
+description = "Профильная картинка 1024×1024 с NFT-подарками, кейсом, Rocket, Mines, колесом и рейтингом. Готова для загрузки через BotFather."
+logical_id = "61b73ac5-1ff3-40e7-bb86-8e9dc4737298"
+content_hash = "sha256:784b45d5e50f6d27f90996de8c1557bd54fe54a13c59bea9b47ddbae6483002b"
+size = 1737256
+mtime_ms = 1789315049027
+storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/61b73ac5-1ff3-40e7-bb86-8e9dc4737298/55651429-d813-4514-a780-6a66a024a910"
+storage_version_token = "1789315087554205"
+content_type = "image/png"
