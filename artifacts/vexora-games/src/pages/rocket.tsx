@@ -314,7 +314,7 @@ export default function RocketGame() {
             <div className="rocket-engine-glow" />
             <div className="rocket-flame" />
             <div className="rocket-shell">
-              <img className="rocket-model-image" src="/assets/epic-reference-rocket.svg" alt="Розовая космическая ракета" />
+              <img className="rocket-model-image" src="/assets/neon-rocket-model.png" alt="Неоновая ракета Vexora" />
             </div>
             {phase === 'crashed' && (
               <div className="rocket-explosion" aria-label="Ракета остановилась">
