@@ -21,9 +21,13 @@ function easeOutExpo(progress: number) {
 
 function getTrajectoryPoint(progress: number) {
   const p = Math.max(0, Math.min(1, progress));
+  const startX = SCENE_WIDTH * 0.05;
+  const startY = SCENE_HEIGHT * 0.78;
+  const endX = SCENE_WIDTH * 0.95;
+  const endY = SCENE_HEIGHT * 0.08;
   return {
-    x: -18 + (SCENE_WIDTH + 36) * p,
-    y: SCENE_HEIGHT - 22 - (SCENE_WIDTH * 0.92 * p * easeOutExpo(p)),
+    x: startX + (endX - startX) * p,
+    y: startY + (endY - startY) * easeOutExpo(p),
   };
 }
 
@@ -84,7 +88,9 @@ export default function RocketGame() {
     flightStartTime: 0,
     crashPoint: 1.00,
     timeLeft: 5.0,
-    lastTick: 0
+    lastTick: 0,
+    currentProgress: 0,
+    crashStartTime: 0,
   });
   const demoUsersRef = useRef<DemoUser[]>([]);
   const playerRef = useRef({
@@ -154,17 +160,20 @@ export default function RocketGame() {
           loopState.current.phase = 'flying';
           loopState.current.crashPoint = getCrashPoint();
           loopState.current.flightStartTime = time;
+          loopState.current.currentProgress = 0;
           setPhase('flying');
           setMultiplier(1.00);
           generateDemoUsers();
         }
       } else if (loopState.current.phase === 'flying') {
         const elapsed = (time - loopState.current.flightStartTime) / 1000;
+        loopState.current.currentProgress = Math.min(1, 1 - 1 / (1 + elapsed * 0.35));
         // Starts gently, then accelerates as the quadratic term grows.
         const currentM = Math.exp((elapsed * 0.06) + (elapsed * elapsed * 0.012));
 
         if (currentM >= loopState.current.crashPoint) {
           loopState.current.phase = 'crashed';
+          loopState.current.crashStartTime = time;
           const finalM = loopState.current.crashPoint;
           setMultiplier(finalM);
           setPhase('crashed');
@@ -238,9 +247,7 @@ export default function RocketGame() {
   };
 
   const selectedNft = MOCK_NFTS.find(n => n.id === selectedNftId);
-  const flightProgress = phase === 'betting'
-    ? 0
-    : Math.min(1, Math.log(Math.max(multiplier, 1)) / Math.log(100));
+  const flightProgress = phase === 'betting' ? 0 : loopState.current.currentProgress;
   const trajectoryPath = buildTrajectoryPath(flightProgress);
   const trajectoryPoint = getTrajectoryPoint(flightProgress);
   const previousPoint = getTrajectoryPoint(Math.max(0, flightProgress - 0.003));
@@ -253,12 +260,15 @@ export default function RocketGame() {
   const idleOffsetY = Math.sin(animationSeconds * ((Math.PI * 2) / 1.7)) * 5;
   const flightWobble = Math.sin(animationSeconds * ((Math.PI * 2) / 1.45)) * 3;
   const rocketLeft = phase === 'betting' ? 50 : (trajectoryPoint.x / SCENE_WIDTH) * 100;
-  const rocketTop = phase === 'betting' ? 31 : (trajectoryPoint.y / SCENE_HEIGHT) * 100;
+  const rocketTop = phase === 'betting' ? 34 : (trajectoryPoint.y / SCENE_HEIGHT) * 100;
   const rocketRotation = phase === 'betting' ? idleRotation : tangentAngle + 47 + flightWobble;
   const rocketOffsetY = phase === 'betting' ? idleOffsetY : 0;
   const countdownValue = Math.max(1, Math.ceil(timeLeft));
   const countdownProgress = Math.max(0, Math.min(1, timeLeft / 5));
   const showCenteredMultiplier = phase === 'crashed' || (phase === 'flying' && rocketTop < 7);
+  const crashAge = phase === 'crashed'
+    ? Math.max(0, (visualTime - loopState.current.crashStartTime) / 1000)
+    : 0;
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background text-foreground overflow-hidden">
@@ -363,10 +373,22 @@ export default function RocketGame() {
             )}
             {phase === 'crashed' && (
               <div className="rocket-explosion" aria-label="Ракета остановилась">
-                <span className="explosion-burst" />
-                <span className="explosion-orbit orbit-one" />
-                <span className="explosion-orbit orbit-two" />
-                <span className="explosion-orbit orbit-three" />
+                {Array.from({ length: 24 }, (_, index) => {
+                  const angle = (index / 24) * Math.PI * 2;
+                  const speed = 2 + ((index * 17) % 40) / 10;
+                  const x = Math.cos(angle) * speed * crashAge * 34;
+                  const y = (Math.sin(angle) * speed * crashAge + crashAge * crashAge * 1.8) * 34;
+                  return (
+                    <i
+                      key={index}
+                      className="rocket-crash-particle"
+                      style={{
+                        opacity: Math.max(0, 1 - crashAge / 1.4),
+                        transform: `translate(${x}px, ${y}px) scale(${Math.max(0.2, 1 - crashAge * 0.55)})`,
+                      }}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>

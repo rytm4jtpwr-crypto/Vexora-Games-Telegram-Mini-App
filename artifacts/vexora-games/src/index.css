@@ -714,6 +714,19 @@
   display: none;
 }
 
+.rocket-crash-particle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px;
+  border-radius: 50%;
+  background: #fb923c;
+  box-shadow: 0 0 8px #fb923c;
+  will-change: transform, opacity;
+}
+
 .explosion-burst {
   width: 92px;
   aspect-ratio: 1;
