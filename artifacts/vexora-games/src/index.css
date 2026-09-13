@@ -767,3 +767,82 @@
   from { opacity: 0; transform: scale(.72) translateY(10px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
+
+/* Multiplier-synchronized RAF rocket motion */
+.rocket-stage.phase-betting .rocket-vehicle {
+  opacity: 1;
+}
+
+.rocket-stage.phase-betting .rocket-trajectory {
+  opacity: 0;
+}
+
+.rocket-vehicle {
+  transition: opacity 160ms ease;
+  will-change: left, top, transform;
+}
+
+.rocket-shell,
+.rocket-vehicle.is-flying .rocket-shell {
+  transform: none;
+  animation: none;
+}
+
+.rocket-attached-flame {
+  position: absolute;
+  z-index: 2;
+  left: 12px;
+  bottom: 15px;
+  width: 31px;
+  height: 23px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 12%, #ffef76 26%, #ff8b63 48%, transparent 72%);
+  filter: blur(2px) drop-shadow(0 0 7px #ff8d6c);
+  transform: rotate(-17deg);
+  opacity: calc(.8 + .2 * var(--flame-pulse, 1));
+  animation: attached-flame-flicker .12s steps(2, end) infinite;
+}
+
+.rocket-emitter {
+  position: absolute;
+  z-index: 1;
+  left: 19px;
+  top: 88px;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.rocket-emitter span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff6c9;
+  box-shadow: 0 0 6px #ff9f70;
+  will-change: transform, opacity;
+}
+
+.rocket-readout.is-countdown {
+  left: 50%;
+  top: 67%;
+}
+
+.rocket-readout.is-result {
+  left: 50%;
+  right: auto;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.rocket-result-value {
+  font-size: clamp(48px, 15vw, 68px);
+}
+
+@keyframes attached-flame-flicker {
+  0% { opacity: .6; scale: .82; }
+  50% { opacity: 1; scale: 1.12; }
+  100% { opacity: .72; scale: .94; }
+}

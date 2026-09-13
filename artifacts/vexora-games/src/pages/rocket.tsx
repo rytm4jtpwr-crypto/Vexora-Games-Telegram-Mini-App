@@ -8,15 +8,33 @@ import { useToast } from '@/hooks/use-toast';
 import { MOCK_NFTS } from '@/App';
 
 const DEMO_NAMES = ["Lucius", "KAIR...", "meryem", "Alex", "0x...", "Doge", "CryptoKing", "VexFan", "Satoshi", "Whale"];
-const PARTICLES = Array.from({ length: 20 }, (_, index) => ({
-  id: index,
-  left: `${(index * 37) % 100}%`,
-  top: `${(index * 61) % 100}%`,
-  duration: `${0.45 + (index % 6) * 0.11}s`,
-  delay: `${(index % 8) * 0.09}s`,
-}));
-
 type Phase = 'betting' | 'flying' | 'crashed';
+
+const SCENE_WIDTH = 400;
+const SCENE_HEIGHT = 300;
+
+function easeOutExpo(progress: number) {
+  if (progress <= 0) return 0;
+  if (progress >= 1) return 1;
+  return 1 - Math.pow(2, -10 * progress);
+}
+
+function getTrajectoryPoint(progress: number) {
+  const p = Math.max(0, Math.min(1, progress));
+  return {
+    x: -18 + (SCENE_WIDTH + 36) * p,
+    y: SCENE_HEIGHT - 22 - (SCENE_WIDTH * 0.92 * p * easeOutExpo(p)),
+  };
+}
+
+function buildTrajectoryPath(progress: number) {
+  if (progress <= 0) return '';
+  const steps = Math.max(2, Math.ceil(progress * 64));
+  return Array.from({ length: steps + 1 }, (_, index) => {
+    const point = getTrajectoryPoint(progress * (index / steps));
+    return `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+  }).join(' ');
+}
 
 interface DemoUser {
   id: string;
@@ -42,6 +60,7 @@ export default function RocketGame() {
   const [phase, setPhase] = useState<Phase>('betting');
   const [multiplier, setMultiplier] = useState(1.00);
   const [timeLeft, setTimeLeft] = useState(5.0);
+  const [visualTime, setVisualTime] = useState(0);
   const [history, setHistory] = useState<number[]>([1.53, 2.40, 1.10, 5.92, 15.74]);
   const [demoUsers, setDemoUsers] = useState<DemoUser[]>([]);
 
@@ -121,6 +140,7 @@ export default function RocketGame() {
 
   useEffect(() => {
     const tick = (time: number) => {
+      setVisualTime(time);
       if (!loopState.current.lastTick) loopState.current.lastTick = time;
       const dt = (time - loopState.current.lastTick) / 1000;
       loopState.current.lastTick = time;
@@ -220,11 +240,25 @@ export default function RocketGame() {
   const selectedNft = MOCK_NFTS.find(n => n.id === selectedNftId);
   const flightProgress = phase === 'betting'
     ? 0
-    : Math.min(1, Math.log(Math.max(multiplier, 1)) / Math.log(8.5));
-  const rocketLeft = 51 + flightProgress * 8;
-  const rocketTop = 60 - flightProgress * 12;
+    : Math.min(1, Math.log(Math.max(multiplier, 1)) / Math.log(100));
+  const trajectoryPath = buildTrajectoryPath(flightProgress);
+  const trajectoryPoint = getTrajectoryPoint(flightProgress);
+  const previousPoint = getTrajectoryPoint(Math.max(0, flightProgress - 0.003));
+  const tangentAngle = Math.atan2(
+    trajectoryPoint.y - previousPoint.y,
+    trajectoryPoint.x - previousPoint.x,
+  ) * (180 / Math.PI);
+  const animationSeconds = visualTime / 1000;
+  const idleRotation = Math.sin(animationSeconds * Math.PI) * 6;
+  const idleOffsetY = Math.sin(animationSeconds * ((Math.PI * 2) / 1.7)) * 5;
+  const flightWobble = Math.sin(animationSeconds * ((Math.PI * 2) / 1.45)) * 3;
+  const rocketLeft = phase === 'betting' ? 50 : (trajectoryPoint.x / SCENE_WIDTH) * 100;
+  const rocketTop = phase === 'betting' ? 31 : (trajectoryPoint.y / SCENE_HEIGHT) * 100;
+  const rocketRotation = phase === 'betting' ? idleRotation : tangentAngle + 47 + flightWobble;
+  const rocketOffsetY = phase === 'betting' ? idleOffsetY : 0;
   const countdownValue = Math.max(1, Math.ceil(timeLeft));
   const countdownProgress = Math.max(0, Math.min(1, timeLeft / 5));
+  const showCenteredMultiplier = phase === 'crashed' || (phase === 'flying' && rocketTop < 7);
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background text-foreground overflow-hidden">
@@ -279,41 +313,54 @@ export default function RocketGame() {
         {/* Graph Area */}
         <div className={`rocket-stage relative h-[300px] w-full shrink-0 overflow-hidden border-b border-border/50 shadow-inner phase-${phase}`}>
           
-          {phase === 'flying' && (
-            PARTICLES.map((particle) => (
-              <div key={particle.id} className="particle" style={{
-                left: particle.left,
-                top: particle.top,
-                animationDuration: particle.duration,
-                animationDelay: particle.delay
-              }} />
-            ))
-          )}
-
           <div className="rocket-aurora" />
           <div className="rocket-stars" />
 
           <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
-            <path 
-              d="M -25,270 C 95,270 155,245 205,205 S 275,125 445,65"
-              fill="none" 
-              stroke={phase === 'crashed' ? "#ff325f" : "#786cff"}
-              strokeWidth="5"
-              strokeLinecap="round"
-              pathLength="1"
-              strokeDasharray="1"
-              strokeDashoffset={phase === 'betting' ? 1 : 1 - flightProgress}
-              className="rocket-trajectory"
-            />
+            {phase !== 'betting' && trajectoryPath && (
+              <path
+                d={trajectoryPath}
+                fill="none"
+                stroke={phase === 'crashed' ? "#ff325f" : "#786cff"}
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="rocket-trajectory"
+              />
+            )}
           </svg>
 
           <div
             className={`rocket-vehicle absolute z-20 ${phase === 'flying' ? 'is-flying' : ''} ${phase === 'crashed' ? 'is-crashed' : ''}`}
-            style={{ left: `${rocketLeft}%`, top: `${rocketTop}%` }}
+            style={{
+              left: `${rocketLeft}%`,
+              top: `${rocketTop}%`,
+              transform: `translate(-50%, -50%) translateY(${rocketOffsetY}px) rotate(${rocketRotation}deg)`,
+            }}
           >
             <div className="rocket-shell">
+              <span className="rocket-attached-flame" aria-hidden="true" />
               <img className="rocket-model-image" src="/assets/neon-rocket-model.png" alt="Неоновая ракета Vexora" />
             </div>
+            {phase === 'flying' && (
+              <div className="rocket-emitter" aria-hidden="true">
+                {Array.from({ length: 12 }, (_, index) => {
+                  const lifetime = 0.4 + (index % 4) * 0.065;
+                  const age = ((animationSeconds + index * 0.071) % lifetime) / lifetime;
+                  const spread = Math.sin(index * 2.31) * 13 * age;
+                  const travel = 12 + age * 46;
+                  return (
+                    <span
+                      key={index}
+                      style={{
+                        opacity: Math.max(0, 1 - age),
+                        transform: `translate(${-travel}px, ${spread}px) scale(${Math.max(0.15, 1 - age * 0.8)})`,
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            )}
             {phase === 'crashed' && (
               <div className="rocket-explosion" aria-label="Ракета остановилась">
                 <span className="explosion-burst" />
@@ -324,13 +371,13 @@ export default function RocketGame() {
             )}
           </div>
           
-          <div className={`rocket-readout ${phase === 'betting' ? 'is-countdown' : ''} ${phase === 'crashed' ? 'is-result' : ''}`}>
+          <div className={`rocket-readout ${phase === 'betting' ? 'is-countdown' : ''} ${showCenteredMultiplier ? 'is-result' : ''}`}>
             {phase === 'betting' ? (
               <div className="rocket-countdown" style={{ '--countdown-progress': countdownProgress } as CSSProperties}>
                 <span>{countdownValue}</span>
               </div>
             ) : (
-              phase === 'crashed' && <div className="rocket-result-value">{multiplier.toFixed(2)}x</div>
+              showCenteredMultiplier && <div className="rocket-result-value">{multiplier.toFixed(2)}x</div>
             )}
           </div>
         </div>
