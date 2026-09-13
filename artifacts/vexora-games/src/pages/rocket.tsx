@@ -98,6 +98,7 @@ export default function RocketGame() {
     timeLeft: 5.0,
     lastTick: 0,
     idleT: 0,
+    starOffset: 0,
     previousProgress: 0,
     currentProgress: 0,
     crashStartTime: 0,
@@ -176,6 +177,7 @@ export default function RocketGame() {
           loopState.current.flightStartTime = time;
           loopState.current.previousProgress = 0;
           loopState.current.currentProgress = 0;
+          loopState.current.starOffset = 0;
           engineParticlesRef.current = [];
           crashParticlesRef.current = [];
           setEngineParticles([]);
@@ -192,6 +194,7 @@ export default function RocketGame() {
         const point = trajectoryPoint(progress);
         // Starts gently, then accelerates as the quadratic term grows.
         const currentM = Math.exp((elapsed * 0.06) + (elapsed * elapsed * 0.012));
+        loopState.current.starOffset += currentM * 0.5;
 
         if (currentM >= loopState.current.crashPoint) {
           loopState.current.phase = 'crashed';
@@ -326,14 +329,15 @@ export default function RocketGame() {
   const idleRotation = Math.sin(loopState.current.idleT) * 0.1 * (180 / Math.PI);
   const idleOffsetY = Math.sin(loopState.current.idleT * 1.3) * 6;
   const flightWobble = Math.sin(visualTime * 0.006) * 0.06;
-  const rocketLeft = phase === 'betting' ? 50 : (currentTrajectoryPoint.x / width) * 100;
-  const rocketTop = phase === 'betting' ? 34 : (currentTrajectoryPoint.y / height) * 100;
-  const rocketRotation = phase === 'betting'
-    ? idleRotation
-    : (angle + flightWobble) * (180 / Math.PI);
-  const rocketOffsetY = phase === 'betting' ? idleOffsetY : 0;
+  const rocketLeft = 50;
+  const rocketTop = 50;
+  const rocketRotation = 0;
+  const rocketOffsetY = 0;
   const countdownValue = Math.max(1, Math.ceil(timeLeft));
   const countdownProgress = Math.max(0, Math.min(1, timeLeft / 5));
+  const boostProgress = multiplier < 2
+    ? 0
+    : Math.min(100, (multiplier - 2) * 10);
   const showCenteredMultiplier = phase === 'crashed' || (phase === 'flying' && rocketTop < 7);
   return (
     <div className="flex flex-col h-[100dvh] bg-background text-foreground overflow-hidden">
@@ -389,7 +393,12 @@ export default function RocketGame() {
         <div className={`rocket-stage relative h-[300px] w-full shrink-0 overflow-hidden border-b border-border/50 shadow-inner phase-${phase}`}>
           
           <div className="rocket-aurora" />
-          <div className="rocket-stars" />
+          <div
+            className="rocket-stars"
+            style={{
+              backgroundPosition: `12px ${18 + loopState.current.starOffset}px, 45px ${68 + loopState.current.starOffset}px`,
+            }}
+          />
 
           <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
             {phase !== 'betting' && trajectoryPath && (
@@ -439,13 +448,25 @@ export default function RocketGame() {
             }}
           >
             <div className="rocket-shell">
-              <span className="rocket-attached-flame" aria-hidden="true" />
-              <img className="rocket-model-image" src="/assets/neon-rocket-model.png" alt="Неоновая ракета Vexora" />
+              <video
+                className="rocket-animation-video"
+                src="/assets/animated-rocket.mp4"
+                poster="/assets/animated-rocket-poster.jpg"
+                autoPlay
+                loop
+                muted
+                playsInline
+                aria-label="Анимированная ракета Vexora"
+              />
             </div>
             {phase === 'crashed' && (
               <div className="rocket-explosion" aria-label="Ракета остановилась">
               </div>
             )}
+          </div>
+
+          <div className={`rocket-boost-meter ${boostProgress > 0 ? 'is-active' : ''}`} aria-hidden="true">
+            <span style={{ height: `${boostProgress}%` }} />
           </div>
           
           <div className={`rocket-readout ${phase === 'betting' ? 'is-countdown' : ''} ${showCenteredMultiplier ? 'is-result' : ''}`}>
