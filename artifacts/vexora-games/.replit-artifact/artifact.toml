@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Vexora Games"
+description = "A Telegram Mini App companion for Vexora Games with a dark modern game hub interface, ready for future demo-only game modules and player features."
+version = "1.0.0"
+id = "artifacts/vexora-games"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19381
+
+[services.development]
+run = "pnpm --filter @workspace/vexora-games run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/vexora-games", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/vexora-games/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19381"
+BASE_PATH = "/"
