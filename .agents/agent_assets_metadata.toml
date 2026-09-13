@@ -28,3 +28,17 @@ mtime_ms = 1789315049027
 storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/61b73ac5-1ff3-40e7-bb86-8e9dc4737298/55651429-d813-4514-a780-6a66a024a910"
 storage_version_token = "1789315087554205"
 content_type = "image/png"
+
+[[outputs]]
+id = "nT59WYDvcaXrMs_RzPkBh"
+uri = "file://attached_assets/generated_images/vexora-games-exact-nft-gifts-profile.png"
+type = "image"
+title = "Готовая фотография Vexora Games"
+description = "Квадратная обложка с вашими пятью NFT-подарками. Нажмите на карточку, скачайте PNG и загрузите через BotFather → Edit Bot → Edit Botpic."
+logical_id = "9679b0cb-9c9f-40b3-a8a4-e8ae011c44f6"
+content_hash = "sha256:94b8ed6e7910010d819aeed11cc86d036a6ef091f9ea96133dabd5dbef92e5b5"
+size = 1439319
+mtime_ms = 1789315512495
+storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/9679b0cb-9c9f-40b3-a8a4-e8ae011c44f6/b68f3586-7870-4e8e-b293-a261f8e68505"
+storage_version_token = "1789315545267252"
+content_type = "image/png"
