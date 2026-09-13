@@ -220,9 +220,11 @@ export default function RocketGame() {
   const selectedNft = MOCK_NFTS.find(n => n.id === selectedNftId);
   const flightProgress = phase === 'betting'
     ? 0
-    : Math.min(1, Math.pow(Math.log(Math.max(multiplier, 1)) / Math.log(100), 1.35));
-  const rocketLeft = 13 + flightProgress * 72;
-  const rocketTop = 79 - flightProgress * 65;
+    : Math.min(1, Math.log(Math.max(multiplier, 1)) / Math.log(8.5));
+  const rocketLeft = 51 + flightProgress * 8;
+  const rocketTop = 60 - flightProgress * 12;
+  const countdownValue = Math.max(1, Math.ceil(timeLeft));
+  const countdownProgress = Math.max(0, Math.min(1, timeLeft / 5));
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background text-foreground overflow-hidden">
@@ -293,12 +295,15 @@ export default function RocketGame() {
 
           <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
             <path 
-              d="M -50,350 Q 150,280 450,-50" 
+              d="M -25,270 C 95,270 155,245 205,205 S 275,125 445,65"
               fill="none" 
-              stroke={phase === 'crashed' ? "hsl(0 85% 60%)" : "hsl(45 95% 55%)"} 
-              strokeWidth="7"
+              stroke={phase === 'crashed' ? "#ff325f" : "#786cff"}
+              strokeWidth="5"
               strokeLinecap="round"
-              className={`rocket-trajectory transition-colors duration-300 ${phase === 'crashed' ? "drop-shadow-[0_0_20px_rgba(239,68,68,1)]" : "drop-shadow-[0_0_22px_rgba(250,204,21,1)]"}`}
+              pathLength="1"
+              strokeDasharray="1"
+              strokeDashoffset={phase === 'betting' ? 1 : 1 - flightProgress}
+              className="rocket-trajectory"
             />
           </svg>
 
@@ -306,47 +311,28 @@ export default function RocketGame() {
             className={`rocket-vehicle absolute z-20 ${phase === 'flying' ? 'is-flying' : ''} ${phase === 'crashed' ? 'is-crashed' : ''}`}
             style={{ left: `${rocketLeft}%`, top: `${rocketTop}%` }}
           >
-            <div className="rocket-smoke-trail" aria-hidden="true">
-              {Array.from({ length: 7 }, (_, index) => <span key={index} style={{ '--smoke-index': index } as CSSProperties} />)}
-            </div>
             <div className="rocket-engine-glow" />
             <div className="rocket-flame" />
             <div className="rocket-shell">
-              <div className="rocket-rider">
-                {selectedNftId === 4 ? (
-                  <img src="/assets/plush-pepe-animated-rider.png" alt="Plush Pepe сидит верхом на ракете и машет рукой" />
-                ) : selectedNft ? (
-                  <img src={selectedNft.image} alt={`${selectedNft.name} летит на ракете`} />
-                ) : null}
-              </div>
-              <img className="rocket-model-image" src="/assets/neon-rocket-model.png" alt="" aria-hidden="true" />
+              <img className="rocket-model-image" src="/assets/epic-reference-rocket.svg" alt="Розовая космическая ракета" />
             </div>
             {phase === 'crashed' && (
               <div className="rocket-explosion" aria-label="Ракета остановилась">
-                <span className="explosion-flash" />
-                <span className="explosion-core" />
-                <span className="explosion-ring ring-one" />
-                <span className="explosion-ring ring-two" />
-                <span className="explosion-smoke smoke-one" />
-                <span className="explosion-smoke smoke-two" />
-                <span className="explosion-smoke smoke-three" />
-                {Array.from({ length: 12 }, (_, index) => (
-                  <i key={index} style={{ '--spark-angle': `${index * 30}deg` } as CSSProperties} />
-                ))}
+                <span className="explosion-burst" />
+                <span className="explosion-orbit orbit-one" />
+                <span className="explosion-orbit orbit-two" />
+                <span className="explosion-orbit orbit-three" />
               </div>
             )}
           </div>
           
-          <div className="absolute top-[33%] left-[27%] -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center">
+          <div className={`rocket-readout ${phase === 'betting' ? 'is-countdown' : ''} ${phase === 'crashed' ? 'is-result' : ''}`}>
             {phase === 'betting' ? (
-              <div className="text-center animate-pop-in">
-                <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Ожидание</div>
-                <div className="text-5xl font-black font-mono text-white text-glow">{timeLeft.toFixed(1)}s</div>
+              <div className="rocket-countdown" style={{ '--countdown-progress': countdownProgress } as CSSProperties}>
+                <span>{countdownValue}</span>
               </div>
             ) : (
-              <div className={`text-5xl md:text-6xl font-black font-mono transition-colors ${phase === 'crashed' ? 'text-red-500 text-glow' : 'text-white text-glow'}`}>
-                {multiplier.toFixed(2)}x
-              </div>
+              phase === 'crashed' && <div className="rocket-result-value">{multiplier.toFixed(2)}x</div>
             )}
           </div>
         </div>
