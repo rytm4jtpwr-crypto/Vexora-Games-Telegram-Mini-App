@@ -84,3 +84,17 @@ mtime_ms = 1789315742355
 storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/33b84934-4ae3-4200-8d8e-b5726506082f/7362421c-af38-447b-813b-40ee34a6a821"
 storage_version_token = "1789315967062914"
 content_type = "image/png"
+
+[[outputs]]
+id = "fLKm8GQvldoiMa19echE5"
+uri = "file://attached_assets/generated_images/vexora-games-description-picture-640x360.png"
+type = "image"
+title = "Vexora Games — картинка описания"
+description = "Широкий PNG 640×360 специально для блока «Что умеет этот бот?». Загружайте через BotFather → Edit Bot → Edit Description Picture."
+logical_id = "d8587961-329a-4ee3-ac21-916ccdee5630"
+content_hash = "sha256:acc82ab28d9ba43b0f5ed32634820f22e2ca842853819d44901b02f70691b3f0"
+size = 255204
+mtime_ms = 1789316216771
+storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/d8587961-329a-4ee3-ac21-916ccdee5630/4d17a91d-10b1-467e-ac25-4db35c2f4361"
+storage_version_token = "1789316231137846"
+content_type = "image/png"
