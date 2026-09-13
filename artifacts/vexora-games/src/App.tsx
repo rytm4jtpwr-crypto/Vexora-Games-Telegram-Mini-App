@@ -22,6 +22,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
+import RocketGame from '@/pages/rocket';
 import { initializeTelegramWebApp } from '@/lib/telegram';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
@@ -29,7 +30,7 @@ const queryClient = new QueryClient();
 
 // --- Mock Data ---
 
-const MOCK_NFTS = [
+export const MOCK_NFTS = [
   { id: 1, name: 'Scared Cat', image: '/assets/cat.png', rarity: 'Legendary' },
   { id: 2, name: "Durov's Cap", image: '/assets/cap.png', rarity: 'Rare' },
   { id: 3, name: 'Mighty Arm', image: '/assets/arm.png', rarity: 'Epic' },
@@ -50,10 +51,19 @@ const MODULES = [
 
 function HubView() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  const [balance] = useState(() => {
+    const saved = Number(localStorage.getItem('vexora_balance'));
+    return Number.isFinite(saved) ? saved : 10240;
+  });
   const filters = ['Все игры', 'Хиты', 'Подарки', 'Бесплатно', 'Новое'];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 
   const handleModuleClick = (mod: typeof MODULES[0]) => {
+    if (mod.id === 'rocket') {
+      setLocation('/rocket');
+      return;
+    }
     toast({
       title: `${mod.name} запускается`,
       description: 'Этот модуль сейчас в разработке.',
@@ -72,7 +82,7 @@ function HubView() {
           </div>
           <div>
             <p className="text-[0.65rem] text-muted-foreground uppercase tracking-wider font-mono">Ваши очки</p>
-            <p className="font-bold text-lg leading-tight">10,240 <span className="text-primary text-sm">VEX</span></p>
+            <p className="font-bold text-lg leading-tight">{balance.toLocaleString()} <span className="text-primary text-sm">VEX</span></p>
           </div>
         </div>
         <button 
@@ -309,6 +319,7 @@ function Router() {
     <RoutedErrorBoundary>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/rocket" component={RocketGame} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>
