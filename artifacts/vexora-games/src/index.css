@@ -246,8 +246,8 @@
 }
 
 .rocket-vehicle {
-  width: 96px;
-  height: 96px;
+  width: 156px;
+  height: 128px;
   transform: translate(-50%, -50%);
   transition:
     left 80ms linear,
@@ -260,18 +260,10 @@
 .rocket-shell {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 42% 36%, hsl(0 0% 100% / 0.22), transparent 22%),
-    hsl(230 25% 8% / 0.7);
-  border: 1px solid hsl(0 0% 100% / 0.18);
-  box-shadow:
-    inset 0 0 24px hsl(0 0% 100% / 0.08),
-    0 0 28px hsl(260 90% 65% / 0.45);
-  backdrop-filter: blur(8px);
+  filter: drop-shadow(0 18px 18px hsl(230 100% 2% / 0.65));
+  transform: rotate(-18deg);
+  transform-style: preserve-3d;
+  perspective: 500px;
 }
 
 .rocket-vehicle.is-flying .rocket-shell {
@@ -282,9 +274,9 @@
 .rocket-flame {
   position: absolute;
   z-index: -1;
-  left: 10px;
-  bottom: 8px;
-  transform: rotate(45deg);
+  left: -12px;
+  bottom: 13px;
+  transform: rotate(63deg);
   transform-origin: center;
   opacity: 0;
 }
@@ -298,8 +290,8 @@
 }
 
 .rocket-flame {
-  width: 18px;
-  height: 70px;
+  width: 24px;
+  height: 92px;
   border-radius: 70% 70% 30% 30%;
   background: linear-gradient(to bottom, white, hsl(45 100% 60%) 35%, hsl(20 100% 55% / 0));
   filter: drop-shadow(0 0 10px hsl(45 100% 55%));
@@ -317,9 +309,154 @@
   opacity: 0;
 }
 
+.rocket-3d-model {
+  position: absolute;
+  left: 31px;
+  bottom: 16px;
+  width: 116px;
+  height: 58px;
+  transform: rotate(-18deg) rotateY(-8deg);
+  transform-style: preserve-3d;
+}
+
+.rocket-3d-body {
+  position: absolute;
+  left: 21px;
+  top: 7px;
+  width: 78px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: 42% 20% 20% 42%;
+  background:
+    linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 70% 90%) 19%, hsl(218 40% 48%) 54%, hsl(226 50% 22%) 76%, hsl(225 60% 10%) 100%);
+  border: 1px solid hsl(200 100% 92% / 0.85);
+  box-shadow:
+    inset 0 6px 7px hsl(0 0% 100% / 0.8),
+    inset 0 -10px 12px hsl(235 80% 12% / 0.8),
+    0 0 18px hsl(190 100% 65% / 0.7);
+}
+
+.rocket-3d-nose {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  top: 8px;
+  width: 43px;
+  height: 42px;
+  clip-path: polygon(0 0, 100% 50%, 0 100%, 22% 50%);
+  background: linear-gradient(160deg, hsl(345 100% 76%), hsl(350 95% 55%) 45%, hsl(342 100% 25%));
+  filter: drop-shadow(4px 2px 5px hsl(340 100% 40% / 0.6));
+}
+
+.rocket-3d-highlight {
+  position: absolute;
+  left: 12px;
+  right: 8px;
+  top: 5px;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, white, transparent);
+  opacity: 0.85;
+}
+
+.rocket-3d-window {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  right: 16px;
+  top: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, white 0 7%, hsl(185 100% 70%) 20%, hsl(205 100% 42%) 55%, hsl(230 75% 18%) 78%);
+  border: 3px solid hsl(220 45% 18%);
+  box-shadow: 0 0 11px hsl(185 100% 65%);
+}
+
+.rocket-3d-band {
+  position: absolute;
+  left: 14px;
+  top: 0;
+  width: 10px;
+  height: 100%;
+  background: linear-gradient(90deg, hsl(270 85% 35%), hsl(285 100% 70%), hsl(260 85% 30%));
+}
+
+.rocket-3d-fin {
+  position: absolute;
+  left: 26px;
+  width: 36px;
+  height: 27px;
+  background: linear-gradient(145deg, hsl(325 100% 70%), hsl(275 90% 52%) 55%, hsl(250 75% 30%));
+  border: 1px solid hsl(300 100% 85% / 0.7);
+  filter: drop-shadow(0 4px 5px hsl(275 100% 35% / 0.45));
+}
+
+.rocket-3d-fin.fin-top {
+  top: -11px;
+  clip-path: polygon(0 100%, 35% 0, 100% 100%);
+}
+
+.rocket-3d-fin.fin-bottom {
+  bottom: -10px;
+  clip-path: polygon(0 0, 100% 0, 35% 100%);
+}
+
+.rocket-3d-engine {
+  position: absolute;
+  left: 9px;
+  top: 13px;
+  width: 24px;
+  height: 33px;
+  border-radius: 8px 3px 3px 8px;
+  background: linear-gradient(180deg, hsl(210 20% 70%), hsl(230 25% 12%) 55%, hsl(210 20% 55%));
+  border: 1px solid hsl(0 0% 100% / 0.45);
+}
+
+.rocket-rider {
+  position: absolute;
+  z-index: 5;
+  left: 58px;
+  top: 2px;
+  width: 76px;
+  height: 78px;
+  transform: rotate(7deg) translateZ(26px);
+  transform-origin: 50% 80%;
+  filter: drop-shadow(0 5px 8px hsl(315 100% 50% / 0.65));
+}
+
+.rocket-rider img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.pepe-waving-arm {
+  position: absolute;
+  z-index: 8;
+  right: 15px;
+  top: 25px;
+  width: 11px;
+  height: 34px;
+  border-radius: 999px;
+  transform-origin: 50% 8%;
+  transform: rotate(-52deg);
+  background: linear-gradient(90deg, hsl(320 100% 58%), hsl(300 100% 76%) 48%, hsl(322 100% 45%));
+  border: 2px solid hsl(305 100% 85% / 0.8);
+  box-shadow: 0 0 10px hsl(315 100% 65%);
+}
+
+.rocket-vehicle.is-flying .pepe-waving-arm {
+  animation: pepe-wave 0.46s ease-in-out infinite alternate;
+}
+
+.rocket-vehicle.is-flying .rocket-rider {
+  animation: rider-bob 0.7s ease-in-out infinite alternate;
+}
+
 .rocket-explosion,
+.explosion-flash,
 .explosion-core,
-.explosion-ring {
+.explosion-ring,
+.explosion-smoke {
   position: absolute;
   inset: 50% auto auto 50%;
   transform: translate(-50%, -50%);
@@ -332,6 +469,14 @@
   z-index: 10;
 }
 
+.explosion-flash {
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, white, hsl(48 100% 65% / 0.95) 14%, hsl(20 100% 55% / 0.6) 35%, transparent 68%);
+  filter: blur(2px);
+  animation: explosion-flash 520ms ease-out both;
+}
+
 .explosion-core {
   width: 72px;
   height: 72px;
@@ -341,11 +486,23 @@
 }
 
 .explosion-ring {
-  width: 56px;
-  height: 56px;
+  width: 76px;
+  height: 76px;
   border: 4px solid hsl(45 100% 65%);
   animation: explosion-ring 800ms ease-out both;
 }
+
+.explosion-smoke {
+  width: 52px;
+  height: 52px;
+  background: radial-gradient(circle at 35% 30%, hsl(0 0% 75%), hsl(230 12% 28%) 55%, transparent 72%);
+  opacity: 0;
+  animation: explosion-smoke 1.25s ease-out both;
+}
+
+.explosion-smoke.smoke-one { margin: -42px 0 0 -55px; animation-delay: 100ms; }
+.explosion-smoke.smoke-two { margin: -50px 0 0 12px; animation-delay: 160ms; }
+.explosion-smoke.smoke-three { margin: 8px 0 0 -18px; animation-delay: 220ms; }
 
 .explosion-ring.ring-two {
   animation-delay: 90ms;
@@ -388,6 +545,12 @@
   100% { scale: 0.75; opacity: 0; }
 }
 
+@keyframes explosion-flash {
+  0% { scale: 0.05; opacity: 1; }
+  45% { scale: 1.25; opacity: 1; }
+  100% { scale: 1.8; opacity: 0; }
+}
+
 @keyframes explosion-ring {
   0% { scale: 0.25; opacity: 1; }
   100% { scale: 2.8; opacity: 0; }
@@ -396,6 +559,22 @@
 @keyframes explosion-spark {
   0% { height: 8px; opacity: 1; }
   100% { height: 90px; opacity: 0; }
+}
+
+@keyframes explosion-smoke {
+  0% { scale: 0.25; opacity: 0; translate: 0 0; }
+  28% { opacity: 0.9; }
+  100% { scale: 1.8; opacity: 0; translate: 0 -52px; }
+}
+
+@keyframes pepe-wave {
+  from { transform: rotate(-78deg); }
+  to { transform: rotate(-18deg); }
+}
+
+@keyframes rider-bob {
+  from { transform: rotate(5deg) translateY(1px) translateZ(26px); }
+  to { transform: rotate(10deg) translateY(-3px) translateZ(26px); }
 }
 
 @keyframes rocket-aurora-shift {
@@ -414,8 +593,12 @@
   .rocket-vehicle.is-flying .rocket-engine-glow,
   .rocket-vehicle.is-flying .rocket-flame,
   .explosion-core,
+  .explosion-flash,
   .explosion-ring,
+  .explosion-smoke,
   .rocket-explosion i,
+  .rocket-vehicle.is-flying .pepe-waving-arm,
+  .rocket-vehicle.is-flying .rocket-rider,
   .bet-dialog {
     animation: none;
   }

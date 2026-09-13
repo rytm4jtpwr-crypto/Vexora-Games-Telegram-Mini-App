@@ -54,7 +54,7 @@ export default function RocketGame() {
   const [winAmount, setWinAmount] = useState<number>(0);
   const [isCashedOut, setIsCashedOut] = useState<boolean>(false);
   
-  const [selectedNftId, setSelectedNftId] = useState<number | null>(null);
+  const [selectedNftId, setSelectedNftId] = useState<number | null>(4);
   const [isGiftSelectorOpen, setIsGiftSelectorOpen] = useState(false);
   const [isBetDialogOpen, setIsBetDialogOpen] = useState(false);
 
@@ -309,17 +309,37 @@ export default function RocketGame() {
             <div className="rocket-engine-glow" />
             <div className="rocket-flame" />
             <div className="rocket-shell">
-              {selectedNft ? (
-                <img src={selectedNft.image} className="w-20 h-20 object-contain -rotate-12 drop-shadow-[0_0_20px_rgba(255,255,255,0.9)]" alt={selectedNft.name} />
-              ) : (
-                <Rocket size={68} strokeWidth={2} className="text-white rotate-45 drop-shadow-[0_0_16px_rgba(255,255,255,1)]" />
-              )}
+              <div className="rocket-rider">
+                {selectedNftId === 4 ? (
+                  <>
+                    <img src="/assets/plush-pepe-rider.png" alt="Plush Pepe летит на ракете" />
+                    <span className="pepe-waving-arm" aria-hidden="true" />
+                  </>
+                ) : selectedNft ? (
+                  <img src={selectedNft.image} alt={`${selectedNft.name} летит на ракете`} />
+                ) : null}
+              </div>
+              <div className="rocket-3d-model" aria-hidden="true">
+                <span className="rocket-3d-nose" />
+                <span className="rocket-3d-body">
+                  <i className="rocket-3d-highlight" />
+                  <i className="rocket-3d-window" />
+                  <i className="rocket-3d-band" />
+                </span>
+                <span className="rocket-3d-fin fin-top" />
+                <span className="rocket-3d-fin fin-bottom" />
+                <span className="rocket-3d-engine" />
+              </div>
             </div>
             {phase === 'crashed' && (
               <div className="rocket-explosion" aria-label="Ракета остановилась">
+                <span className="explosion-flash" />
                 <span className="explosion-core" />
                 <span className="explosion-ring ring-one" />
                 <span className="explosion-ring ring-two" />
+                <span className="explosion-smoke smoke-one" />
+                <span className="explosion-smoke smoke-two" />
+                <span className="explosion-smoke smoke-three" />
                 {Array.from({ length: 12 }, (_, index) => (
                   <i key={index} style={{ '--spark-angle': `${index * 30}deg` } as CSSProperties} />
                 ))}
