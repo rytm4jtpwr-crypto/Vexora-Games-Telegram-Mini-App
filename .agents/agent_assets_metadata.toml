@@ -56,3 +56,17 @@ mtime_ms = 1789315615150
 storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/0e7ac09d-2090-4aef-bc8e-ffbae6b9244e/b1a9c448-7c12-4cba-99f1-dfaeeb1e916f"
 storage_version_token = "1789315632385191"
 content_type = "image/png"
+
+[[outputs]]
+id = "DS2cONpUMu5AJmUstt-Cd"
+uri = "file://attached_assets/generated_images/vexora-games-final-profile.png"
+type = "image"
+title = "VEXORA GAMES — финальная обложка"
+description = "Итоговая версия с NFT-подарками, Rocket, рулеткой, Mines, кейсом и названием VEXORA GAMES снизу."
+logical_id = "d69fcd12-e0fb-46d7-9a8d-a86339c43aa9"
+content_hash = "sha256:f65f25ce9f11e2599867daecdd35f1b21625c5f83fc135c1ed06091589935a4d"
+size = 1687358
+mtime_ms = 1789315674202
+storage_uri = "gcs://replit-rams-assets-kira/rams/assets/repl:cc4d828a-9602-449f-88b4-2e851d7397dd/d69fcd12-e0fb-46d7-9a8d-a86339c43aa9/fb9d17a5-5116-4f39-ac66-adde3329e96f"
+storage_version_token = "1789315687506479"
+content_type = "image/png"
