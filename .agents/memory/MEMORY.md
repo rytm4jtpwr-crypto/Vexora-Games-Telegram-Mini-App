@@ -1,0 +1,1 @@
+- [grammY bundling](grammy-esbuild.md) — keep grammY external in the esbuild server bundle so its Node platform module resolves at runtime.
