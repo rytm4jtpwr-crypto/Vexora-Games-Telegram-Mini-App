@@ -22,7 +22,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
-import RocketGame from '@/pages/rocket';
 import { initializeTelegramWebApp } from '@/lib/telegram';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
@@ -51,7 +50,6 @@ const MODULES = [
 
 function HubView() {
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
   const [balance] = useState(() => {
     const saved = Number(localStorage.getItem('vexora_balance'));
     return Number.isFinite(saved) ? saved : 10240;
@@ -60,10 +58,6 @@ function HubView() {
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 
   const handleModuleClick = (mod: typeof MODULES[0]) => {
-    if (mod.id === 'rocket') {
-      setLocation('/rocket');
-      return;
-    }
     toast({
       title: `${mod.name} запускается`,
       description: 'Этот модуль сейчас в разработке.',
@@ -319,7 +313,6 @@ function Router() {
     <RoutedErrorBoundary>
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/rocket" component={RocketGame} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>
