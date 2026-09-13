@@ -86,6 +86,8 @@ export default function RocketGame() {
     crashPoint: 1.00,
     timeLeft: 5.0,
     lastTick: 0,
+    idleT: 0,
+    previousProgress: 0,
     currentProgress: 0,
     crashStartTime: 0,
   });
@@ -149,6 +151,7 @@ export default function RocketGame() {
       loopState.current.lastTick = time;
 
       if (loopState.current.phase === 'betting') {
+        loopState.current.idleT += 0.02;
         const newTime = Math.max(0, loopState.current.timeLeft - dt);
         loopState.current.timeLeft = newTime;
         setTimeLeft(newTime);
@@ -157,6 +160,7 @@ export default function RocketGame() {
           loopState.current.phase = 'flying';
           loopState.current.crashPoint = getCrashPoint();
           loopState.current.flightStartTime = time;
+          loopState.current.previousProgress = 0;
           loopState.current.currentProgress = 0;
           setPhase('flying');
           setMultiplier(1.00);
@@ -165,6 +169,7 @@ export default function RocketGame() {
       } else if (loopState.current.phase === 'flying') {
         const elapsed = (time - loopState.current.flightStartTime) / 1000;
         const progress = Math.min(1, 1 - 1 / (1 + elapsed * 0.35));
+        loopState.current.previousProgress = loopState.current.currentProgress;
         loopState.current.currentProgress = progress;
         // Starts gently, then accelerates as the quadratic term grows.
         const currentM = Math.exp((elapsed * 0.06) + (elapsed * elapsed * 0.012));
@@ -248,14 +253,14 @@ export default function RocketGame() {
   const flightProgress = phase === 'betting' ? 0 : loopState.current.currentProgress;
   const trajectoryPath = buildTrajectoryPath(flightProgress);
   const currentTrajectoryPoint = trajectoryPoint(flightProgress);
-  const previousPoint = trajectoryPoint(Math.max(0, flightProgress - 0.003));
+  const previousPoint = trajectoryPoint(loopState.current.previousProgress);
   const tangentAngle = Math.atan2(
     currentTrajectoryPoint.y - previousPoint.y,
     currentTrajectoryPoint.x - previousPoint.x,
   ) * (180 / Math.PI);
   const animationSeconds = visualTime / 1000;
-  const idleRotation = Math.sin(animationSeconds * Math.PI) * 6;
-  const idleOffsetY = Math.sin(animationSeconds * ((Math.PI * 2) / 1.7)) * 5;
+  const idleRotation = Math.sin(loopState.current.idleT) * 0.1 * (180 / Math.PI);
+  const idleOffsetY = Math.sin(loopState.current.idleT * 1.3) * 6;
   const flightWobble = Math.sin(animationSeconds * ((Math.PI * 2) / 1.45)) * 3;
   const rocketLeft = phase === 'betting' ? 50 : (currentTrajectoryPoint.x / width) * 100;
   const rocketTop = phase === 'betting' ? 34 : (currentTrajectoryPoint.y / height) * 100;
