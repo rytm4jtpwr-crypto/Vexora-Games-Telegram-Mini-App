@@ -164,7 +164,8 @@ export default function RocketGame() {
         }
       } else if (loopState.current.phase === 'flying') {
         const elapsed = (time - loopState.current.flightStartTime) / 1000;
-        loopState.current.currentProgress = Math.min(1, 1 - 1 / (1 + elapsed * 0.35));
+        const progress = Math.min(1, 1 - 1 / (1 + elapsed * 0.35));
+        loopState.current.currentProgress = progress;
         // Starts gently, then accelerates as the quadratic term grows.
         const currentM = Math.exp((elapsed * 0.06) + (elapsed * elapsed * 0.012));
 
