@@ -1,6 +1,7 @@
 import type { Bot } from "grammy";
 import { logger } from "../lib/logger";
 import {
+  getMiniAppUrl,
   getTelegramBotMode,
   getTelegramWebhookUrl,
 } from "./config";
@@ -15,9 +16,17 @@ export async function startTelegramBot(): Promise<void> {
     logger.error({ err: error.error }, "Telegram bot update failed");
   });
 
+  await bot.init();
   await bot.api.setMyCommands([
     { command: "start", description: "Открыть Vexora Games" },
   ]);
+  await bot.api.setChatMenuButton({
+    menu_button: {
+      type: "web_app",
+      text: "Открыть Vexora Games",
+      web_app: { url: getMiniAppUrl() },
+    },
+  });
 
   if (getTelegramBotMode() === "webhook") {
     const webhookUrl = getTelegramWebhookUrl();
