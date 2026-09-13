@@ -614,11 +614,12 @@
 }
 
 .rocket-vehicle {
-  width: 118px;
-  height: 92px;
+  width: 116px;
+  height: 126px;
 }
 
 .rocket-shell {
+  inset: 0;
   transform: rotate(-11deg);
 }
 
@@ -626,31 +627,12 @@
   animation: reference-rocket-float 2.4s ease-in-out infinite;
 }
 
-.rocket-engine-glow,
-.rocket-flame {
-  left: -29px;
-  bottom: -7px;
-  transform: rotate(67deg);
-}
-
-.rocket-engine-glow {
-  width: 38px;
-  height: 38px;
-  background: #8677ffb8;
-}
-
-.rocket-flame {
-  width: 12px;
-  height: 68px;
-  background: linear-gradient(to bottom, #fff, #75e8ff 24%, #776bff 56%, transparent);
-  filter: drop-shadow(0 0 9px #7067ff);
-}
-
 .rocket-model-image {
   left: 0;
   bottom: 0;
-  width: 118px;
-  height: 92px;
+  width: 116px;
+  height: 126px;
+  object-fit: contain;
   filter:
     drop-shadow(0 0 8px hsl(325 100% 65% / 0.62))
     drop-shadow(0 10px 10px hsl(300 100% 15% / 0.5));

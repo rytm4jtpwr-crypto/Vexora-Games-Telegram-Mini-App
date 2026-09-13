@@ -311,8 +311,6 @@ export default function RocketGame() {
             className={`rocket-vehicle absolute z-20 ${phase === 'flying' ? 'is-flying' : ''} ${phase === 'crashed' ? 'is-crashed' : ''}`}
             style={{ left: `${rocketLeft}%`, top: `${rocketTop}%` }}
           >
-            <div className="rocket-engine-glow" />
-            <div className="rocket-flame" />
             <div className="rocket-shell">
               <img className="rocket-model-image" src="/assets/neon-rocket-model.png" alt="Неоновая ракета Vexora" />
             </div>
