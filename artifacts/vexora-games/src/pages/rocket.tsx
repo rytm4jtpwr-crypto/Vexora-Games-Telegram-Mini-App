@@ -450,8 +450,8 @@ export default function RocketGame() {
             <div className="rocket-shell">
               <video
                 className="rocket-animation-video"
-                src="/assets/animated-rocket.mp4"
-                poster="/assets/animated-rocket-poster.jpg"
+                src="/assets/animated-rocket-transparent.webm"
+                poster="/assets/animated-rocket-poster.png"
                 autoPlay
                 loop
                 muted
