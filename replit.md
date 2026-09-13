@@ -12,6 +12,7 @@ Telegram Mini App starter with a grammY bot, a dark game hub interface, and a st
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required secret: `BOT_TOKEN` — Telegram Bot API token, stored in Replit Secrets
 - Optional env: `MINI_APP_URL` — absolute HTTPS URL for the Telegram Mini App button
+- Optional env: `TELEGRAM_BOT_MODE` — `polling` for development or `webhook` for production
 
 ## Stack
 
@@ -36,6 +37,7 @@ Telegram Mini App starter with a grammY bot, a dark game hub interface, and a st
 
 - The Telegram bot runs beside the Express API service so one workflow owns the server-side process.
 - The Mini App URL is configured with `MINI_APP_URL`; development falls back to the current Replit dev domain.
+- Development uses polling and production uses a Telegram webhook so two runtimes do not compete for updates.
 - No database, balance, payment, currency, or game engine is included in the first stage.
 - Future game areas are represented as coming-soon UI states, not fake playable mechanics.
 

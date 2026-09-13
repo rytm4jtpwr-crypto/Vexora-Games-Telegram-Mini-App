@@ -10,6 +10,7 @@
 - Тёмная адаптивная страница Vexora Games для Telegram WebView.
 - Подготовленные зоны для будущих разделов: профиль, баланс VEX, Mines, Rocket, Roulette, Cases, Daily Bonus и Leaderboard.
 - Express health endpoint: `GET /api/healthz`.
+- Production webhook endpoint: `POST /api/telegram/webhook`.
 - TypeScript-проверка и отдельные workspace-пакеты для сервера и Mini App.
 
 ## Переменные окружения
@@ -25,9 +26,12 @@ cp artifacts/api-server/.env.example artifacts/api-server/.env
 ```env
 BOT_TOKEN=токен_от_BotFather
 MINI_APP_URL=https://ваш-https-url/
+TELEGRAM_BOT_MODE=polling
 ```
 
 Токен не нужно добавлять в код, git или сообщения. В Replit используйте Secret с именем `BOT_TOKEN`. `MINI_APP_URL` — абсолютный HTTPS-адрес, который будет открыт Telegram-кнопкой. В среде Replit разработки, если `MINI_APP_URL` не задан, бот попробует использовать `REPLIT_DEV_DOMAIN`.
+
+В development бот использует long polling. В production используется webhook на `/api/telegram/webhook`, поэтому preview и опубликованное приложение не конфликтуют за один Telegram Bot API поток обновлений.
 
 ## Запуск
 

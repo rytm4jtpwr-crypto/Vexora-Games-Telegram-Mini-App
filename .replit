@@ -21,3 +21,14 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+MINI_APP_URL = "https://vexora-games-telegram-mini-app--nyruknyruk75.replit.app/"
+
+[userenv.development]
+TELEGRAM_BOT_MODE = "polling"
+
+[userenv.production]
+TELEGRAM_BOT_MODE = "webhook"
