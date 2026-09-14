@@ -24,6 +24,12 @@ import NotFound from '@/pages/not-found';
 import RocketGame from '@/pages/rocket';
 import RouletteGame from '@/pages/roulette';
 import { initializeTelegramWebApp } from '@/lib/telegram';
+import {
+  readNumber,
+  readRouletteInventory,
+  STAR_BALANCE_KEY,
+  TON_BALANCE_KEY,
+} from '@/lib/roulette-rewards';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 const queryClient = new QueryClient();
@@ -53,9 +59,9 @@ function HubView() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [balance] = useState(() => {
-    const saved = Number(localStorage.getItem('vexora_balance'));
-    return Number.isFinite(saved) ? saved : 10240;
+    return readNumber(TON_BALANCE_KEY, 10240);
   });
+  const [starBalance] = useState(() => readNumber(STAR_BALANCE_KEY));
   const filters = ['Все игры', 'Хиты', 'Подарки', 'Бесплатно', 'Новое'];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
 
@@ -80,7 +86,7 @@ function HubView() {
       
       {/* TON Header */}
       <div className="flex items-center justify-between glass-panel rounded-2xl p-3">
-        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full overflow-hidden border border-sky-400/40 shadow-[0_0_14px_rgba(0,152,219,0.25)]">
             <img
               src={`${import.meta.env.BASE_URL}assets/ton-coin.webp`}
@@ -93,12 +99,10 @@ function HubView() {
             <p className="font-bold text-lg leading-tight">{balance.toLocaleString()} <span className="text-sky-400 text-sm">TON</span></p>
           </div>
         </div>
-        <button 
-          onClick={() => toast({ description: 'TON появятся после запуска.' })}
-          className="bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
-        >
-          О TON
-        </button>
+        <div className="flex items-center gap-1.5 rounded-xl bg-yellow-400/10 px-3 py-2 text-yellow-300">
+          <Star size={16} fill="currentColor" />
+          <strong className="font-mono text-sm">{starBalance.toLocaleString()}</strong>
+        </div>
       </div>
 
       {/* Filter Pills */}
@@ -252,6 +256,42 @@ function EmptyStateView({ title, icon: Icon }: { title: string; icon: any }) {
   );
 }
 
+function InventoryView() {
+  const [items] = useState(readRouletteInventory);
+
+  if (items.length === 0) {
+    return <EmptyStateView title="Подарки и Инвентарь" icon={PackageOpen} />;
+  }
+
+  return (
+    <div className="px-4 pb-24 pt-5 animate-pop-in">
+      <div className="mb-5">
+        <h2 className="text-2xl font-bold">Инвентарь</h2>
+        <p className="mt-1 text-sm text-muted-foreground">NFT-подарки, выигранные в Roulette</p>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {items.map((item) => (
+          <article key={item.id} className="rounded-2xl border border-border bg-gradient-to-br from-secondary to-background p-3 shadow-lg">
+            <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-fuchsia-500 via-purple-600 to-indigo-700">
+              <video
+                src={`${import.meta.env.BASE_URL}assets/roulette-gifts/${item.video}`}
+                poster={`${import.meta.env.BASE_URL}assets/roulette-gifts/${item.poster}`}
+                className="h-full w-full object-contain drop-shadow-xl"
+                autoPlay
+                loop
+                muted
+                playsInline
+              />
+            </div>
+            <h3 className="mt-3 truncate text-sm font-bold">{item.name}</h3>
+            <p className="mt-1 text-[0.65rem] uppercase tracking-wider text-fuchsia-300">Выиграно в Roulette</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // --- Main App Component ---
 
 function Home() {
@@ -281,7 +321,7 @@ function Home() {
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto">
         {activeTab === 'hub' && <HubView />}
-        {activeTab === 'gifts' && <EmptyStateView title="Подарки и Инвентарь" icon={PackageOpen} />}
+        {activeTab === 'gifts' && <InventoryView />}
         {activeTab === 'leaders' && <EmptyStateView title="Рейтинг Игроков" icon={Trophy} />}
         {activeTab === 'profile' && <EmptyStateView title="Профиль" icon={User} />}
       </main>

@@ -1,3 +1,4 @@
 - [grammY bundling](grammy-esbuild.md) — keep grammY external in the esbuild server bundle so its Node platform module resolves at runtime.
 - [Telegram runtime modes](telegram-runtime-modes.md) — use polling in development and webhook delivery in production to avoid Bot API 409 conflicts.
 - [VEX and Gifts safety](vex-gifts-safety.md) — VEX remains free and non-redeemable; Telegram Gifts may be shown in games but never wagered, transferred, or lost.
+- [NFT animation backgrounds](nft-animation-backgrounds.md) — remove recorded gift backgrounds frame-by-frame; color keying leaves visible gradients and patterns.

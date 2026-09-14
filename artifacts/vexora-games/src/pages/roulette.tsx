@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { ArrowLeft, CircleDot, Gem, Sparkles, Star } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { claimRoulettePrize, readNumber, TON_BALANCE_KEY } from '@/lib/roulette-rewards';
 
 const ITEM_WIDTH = 126;
 const ITEM_GAP = 16;
@@ -20,6 +21,12 @@ const PLACEHOLDER_ITEMS = [
   { id: 'mighty-arm', label: 'Mighty Arm', video: 'mighty-arm.webm', tone: 'gold' },
 ];
 
+const WEIGHTED_ITEMS = [
+  ...Array.from({ length: 15 }, () => PLACEHOLDER_ITEMS[0]),
+  ...Array.from({ length: 15 }, () => PLACEHOLDER_ITEMS[1]),
+  ...PLACEHOLDER_ITEMS.slice(2),
+];
+
 export default function RouletteGame() {
   const [, setLocation] = useLocation();
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -28,17 +35,25 @@ export default function RouletteGame() {
   const [spinCount, setSpinCount] = useState(0);
   const [wonPrize, setWonPrize] = useState<(typeof PLACEHOLDER_ITEMS)[number] | null>(null);
   const [balance, setBalance] = useState(() => {
-    const saved = Number(localStorage.getItem('vexora_balance'));
-    return Number.isFinite(saved) ? saved : 10240;
+    return readNumber(TON_BALANCE_KEY, 10240);
   });
 
   const reelItems = useMemo(
-    () => Array.from({ length: 48 }, (_, index) => ({
-      ...PLACEHOLDER_ITEMS[index % PLACEHOLDER_ITEMS.length],
-      reelId: `${index}-${PLACEHOLDER_ITEMS[index % PLACEHOLDER_ITEMS.length].id}`,
-    })),
+    () => Array.from({ length: 80 }, (_, index) => {
+      const prize = WEIGHTED_ITEMS[Math.floor(Math.random() * WEIGHTED_ITEMS.length)];
+      return {
+        ...prize,
+        reelId: `${index}-${prize.id}`,
+      };
+    }),
     [],
   );
+
+  const getWinLabel = (prize: (typeof PLACEHOLDER_ITEMS)[number]) => {
+    if (prize.id === 'star') return '100 Star';
+    if (prize.id === 'ton') return '1 TON';
+    return prize.label;
+  };
 
   const setTrackPosition = (index: number, animate: boolean) => {
     const track = trackRef.current;
@@ -59,11 +74,11 @@ export default function RouletteGame() {
     setWonPrize(null);
     const nextBalance = balance - 1;
     setBalance(nextBalance);
-    localStorage.setItem('vexora_balance', String(nextBalance));
+    localStorage.setItem(TON_BALANCE_KEY, String(nextBalance));
     setIsSpinning(true);
 
-    const startIndex = 2 + (spinCount % PLACEHOLDER_ITEMS.length);
-    const targetIndex = 21 + Math.floor(Math.random() * 4);
+    const startIndex = 2 + (spinCount % 6);
+    const targetIndex = 48 + Math.floor(Math.random() * 20);
     setTrackPosition(startIndex, false);
 
     requestAnimationFrame(() => {
@@ -75,6 +90,13 @@ export default function RouletteGame() {
       setSpinCount((count) => count + 1);
       setWonPrize(reelItems[targetIndex]);
     }, 4700);
+  };
+
+  const claimPrize = () => {
+    if (!wonPrize) return;
+    const result = claimRoulettePrize(wonPrize);
+    if (result.tonBalance !== undefined) setBalance(result.tonBalance);
+    setWonPrize(null);
   };
 
   return (
@@ -170,8 +192,8 @@ export default function RouletteGame() {
                 wonPrize.icon && <wonPrize.icon size={108} strokeWidth={1.5} />
               )}
             </div>
-            <strong>{wonPrize.label}</strong>
-            <button type="button" onClick={() => setWonPrize(null)}>Забрать</button>
+            <strong>Вы выиграли {getWinLabel(wonPrize)}</strong>
+            <button type="button" onClick={claimPrize}>Забрать</button>
           </section>
         </div>
       )}
