@@ -22,6 +22,7 @@ import { useToast } from '@/hooks/use-toast';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import NotFound from '@/pages/not-found';
 import RocketGame from '@/pages/rocket';
+import RouletteGame from '@/pages/roulette';
 import { initializeTelegramWebApp } from '@/lib/telegram';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
@@ -61,6 +62,10 @@ function HubView() {
   const handleModuleClick = (mod: typeof MODULES[0]) => {
     if (mod.id === 'rocket') {
       setLocation('/rocket');
+      return;
+    }
+    if (mod.id === 'roulette') {
+      setLocation('/roulette');
       return;
     }
     toast({
@@ -323,6 +328,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/rocket" component={RocketGame} />
+        <Route path="/roulette" component={RouletteGame} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>
