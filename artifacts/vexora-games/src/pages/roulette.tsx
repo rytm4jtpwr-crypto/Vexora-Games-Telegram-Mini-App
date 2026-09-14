@@ -8,16 +8,16 @@ const ITEM_GAP = 16;
 const PLACEHOLDER_ITEMS = [
   { id: 'ton', label: 'TON', icon: Gem, tone: 'violet' },
   { id: 'star', label: 'Star', icon: Star, tone: 'blue' },
-  { id: 'plush-pepe', label: 'Plush Pepe', video: 'plush-pepe.mp4', tone: 'gold' },
-  { id: 'snoop-silver', label: 'Snoop Dogg', video: 'snoop-dogg-silver.mp4', tone: 'gold' },
-  { id: 'snoop-sport', label: 'Snoop Dogg', video: 'snoop-dogg-sport.mp4', tone: 'blue' },
-  { id: 'mood-pack', label: 'Mood Pack', video: 'mood-pack.mp4', tone: 'pink' },
-  { id: 'cupid-skull', label: 'Cupid Charm', video: 'cupid-charm-skull.mp4', tone: 'blue' },
-  { id: 'cupid-jewels', label: 'Cupid Charm', video: 'cupid-charm-jewels.mp4', tone: 'pink' },
-  { id: 'toy-bear', label: 'Toy Bear', video: 'toy-bear.mp4', tone: 'violet' },
-  { id: 'sharp-tongue', label: 'Sharp Tongue', video: 'sharp-tongue.mp4', tone: 'violet' },
-  { id: 'scared-cat', label: 'Scared Cat', video: 'scared-cat.mp4', tone: 'blue' },
-  { id: 'mighty-arm', label: 'Mighty Arm', video: 'mighty-arm.mp4', tone: 'gold' },
+  { id: 'plush-pepe', label: 'Plush Pepe', video: 'plush-pepe.webm', tone: 'gold' },
+  { id: 'snoop-silver', label: 'Snoop Dogg', video: 'snoop-dogg-silver.webm', tone: 'gold' },
+  { id: 'snoop-sport', label: 'Snoop Dogg', video: 'snoop-dogg-sport.webm', tone: 'blue' },
+  { id: 'mood-pack', label: 'Mood Pack', video: 'mood-pack.webm', tone: 'pink' },
+  { id: 'cupid-skull', label: 'Cupid Charm', video: 'cupid-charm-skull.webm', tone: 'blue' },
+  { id: 'cupid-jewels', label: 'Cupid Charm', video: 'cupid-charm-jewels.webm', tone: 'pink' },
+  { id: 'toy-bear', label: 'Toy Bear', video: 'toy-bear.webm', tone: 'violet' },
+  { id: 'sharp-tongue', label: 'Sharp Tongue', video: 'sharp-tongue.webm', tone: 'violet' },
+  { id: 'scared-cat', label: 'Scared Cat', video: 'scared-cat.webm', tone: 'blue' },
+  { id: 'mighty-arm', label: 'Mighty Arm', video: 'mighty-arm.webm', tone: 'gold' },
 ];
 
 export default function RouletteGame() {
@@ -26,6 +26,7 @@ export default function RouletteGame() {
   const trackRef = useRef<HTMLDivElement>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinCount, setSpinCount] = useState(0);
+  const [wonPrize, setWonPrize] = useState<(typeof PLACEHOLDER_ITEMS)[number] | null>(null);
   const [balance, setBalance] = useState(() => {
     const saved = Number(localStorage.getItem('vexora_balance'));
     return Number.isFinite(saved) ? saved : 10240;
@@ -55,6 +56,7 @@ export default function RouletteGame() {
   const spin = () => {
     if (isSpinning || balance < 1) return;
 
+    setWonPrize(null);
     const nextBalance = balance - 1;
     setBalance(nextBalance);
     localStorage.setItem('vexora_balance', String(nextBalance));
@@ -71,6 +73,7 @@ export default function RouletteGame() {
     window.setTimeout(() => {
       setIsSpinning(false);
       setSpinCount((count) => count + 1);
+      setWonPrize(reelItems[targetIndex]);
     }, 4700);
   };
 
@@ -106,7 +109,7 @@ export default function RouletteGame() {
                     {video ? (
                       <video
                         src={`${import.meta.env.BASE_URL}assets/roulette-gifts/${video}`}
-                        poster={`${import.meta.env.BASE_URL}assets/roulette-gifts/${video.replace('.mp4', '.jpg')}`}
+                        poster={`${import.meta.env.BASE_URL}assets/roulette-gifts/${video.replace('.webm', '.png')}`}
                         autoPlay
                         loop
                         muted
@@ -115,7 +118,7 @@ export default function RouletteGame() {
                       />
                     ) : (
                       <>
-                        {Icon && <Icon size={58} strokeWidth={1.7} />}
+                        {Icon && <Icon className="roulette-prize-icon" size={76} strokeWidth={1.7} />}
                         <Sparkles className="roulette-item-spark" size={20} />
                       </>
                     )}
@@ -144,6 +147,34 @@ export default function RouletteGame() {
           <p>Star, TON и коллекционные NFT-подарки</p>
         </section>
       </main>
+
+      {wonPrize && (
+        <div className="roulette-win-overlay" role="dialog" aria-modal="true" aria-labelledby="roulette-win-title">
+          <div className="roulette-win-confetti" aria-hidden="true">
+            {Array.from({ length: 16 }, (_, index) => <i key={index} />)}
+          </div>
+          <section className={`roulette-win-card tone-${wonPrize.tone}`}>
+            <span className="roulette-win-kicker">Поздравляем!</span>
+            <h2 id="roulette-win-title">Ваш выигрыш</h2>
+            <div className="roulette-win-prize">
+              {wonPrize.video ? (
+                <video
+                  src={`${import.meta.env.BASE_URL}assets/roulette-gifts/${wonPrize.video}`}
+                  poster={`${import.meta.env.BASE_URL}assets/roulette-gifts/${wonPrize.video.replace('.webm', '.png')}`}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
+              ) : (
+                wonPrize.icon && <wonPrize.icon size={108} strokeWidth={1.5} />
+              )}
+            </div>
+            <strong>{wonPrize.label}</strong>
+            <button type="button" onClick={() => setWonPrize(null)}>Забрать</button>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
