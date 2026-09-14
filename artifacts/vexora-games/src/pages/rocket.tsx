@@ -50,6 +50,8 @@ export default function RocketGame() {
   });
   const [activeBet, setActiveBet] = useState<number | null>(null);
   const [cashedOutAt, setCashedOutAt] = useState<number | null>(null);
+  const stageRef = useRef<HTMLElement>(null);
+  const trajectoryRef = useRef<SVGPathElement>(null);
   const vehicleRef = useRef<HTMLDivElement>(null);
   const explosionRef = useRef<HTMLDivElement>(null);
   const multiplierRef = useRef(1);
@@ -141,9 +143,20 @@ export default function RocketGame() {
               );
 
       displayedProgress += (targetProgress - displayedProgress) * 0.08;
-      const point = getTrajectoryPoint(displayedProgress);
-      const previous = getTrajectoryPoint(Math.max(0, displayedProgress - 0.008));
-      const tangent = Math.atan2(point.y - previous.y, point.x - previous.x) * (180 / Math.PI);
+      const trajectory = trajectoryRef.current;
+      const trajectoryLength = trajectory?.getTotalLength() ?? 0;
+      const point = trajectoryLength
+        ? trajectory!.getPointAtLength(trajectoryLength * displayedProgress)
+        : getTrajectoryPoint(displayedProgress);
+      const previous = trajectoryLength
+        ? trajectory!.getPointAtLength(trajectoryLength * Math.max(0, displayedProgress - 0.008))
+        : getTrajectoryPoint(Math.max(0, displayedProgress - 0.008));
+      const stageWidth = stageRef.current?.clientWidth ?? 100;
+      const stageHeight = stageRef.current?.clientHeight ?? 100;
+      const tangent = Math.atan2(
+        (point.y - previous.y) * stageHeight,
+        (point.x - previous.x) * stageWidth,
+      ) * (180 / Math.PI);
       const wobble = Math.sin(time / 90) * 1.5;
 
       if (vehicleRef.current) {
@@ -218,12 +231,13 @@ export default function RocketGame() {
       </header>
 
       <main className="rocket-content">
-        <section className={`rocket-stage phase-${phase}`}>
+        <section ref={stageRef} className={`rocket-stage phase-${phase}`}>
           <div className="rocket-aurora" />
           <div className="rocket-stars" />
 
           <svg className="rocket-flight-path" viewBox="0 0 100 100" preserveAspectRatio="none">
             <path
+              ref={trajectoryRef}
               className="rocket-trajectory"
               d="M 24 79 Q 55 78 78 21"
               pathLength="1"
@@ -286,7 +300,22 @@ export default function RocketGame() {
         <section className="rocket-bet-panel">
           <div className="rocket-bet-label">
             <span>Сумма ставки</span>
-            <strong>{betAmount} VEX</strong>
+            <label className="rocket-bet-custom">
+              <input
+                type="number"
+                min="1"
+                step="1"
+                inputMode="numeric"
+                value={betAmount || ''}
+                onChange={(event) => {
+                  const nextAmount = Number(event.target.value);
+                  setBetAmount(Number.isFinite(nextAmount) ? Math.max(0, nextAmount) : 0);
+                }}
+                disabled={phase !== 'betting' || activeBet !== null}
+                aria-label="Сумма ставки VEX"
+              />
+              <span>VEX</span>
+            </label>
           </div>
           <div className="rocket-bet-controls">
             {[50, 100, 250, 500].map((amount) => (

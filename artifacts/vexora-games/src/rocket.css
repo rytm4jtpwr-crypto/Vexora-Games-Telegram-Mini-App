@@ -376,6 +376,46 @@
   font: 600 14px/1 var(--app-font-mono);
 }
 
+.rocket-bet-custom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #f0eaff;
+  font: 600 14px/1 var(--app-font-mono);
+}
+
+.rocket-bet-custom input {
+  width: 92px;
+  padding: 7px 9px;
+  color: #f0eaff;
+  text-align: right;
+  background: #1c1c24;
+  border: 1px solid rgba(137, 108, 255, 0.32);
+  border-radius: 9px;
+  outline: none;
+  font: inherit;
+  appearance: textfield;
+}
+
+.rocket-bet-custom input:focus {
+  border-color: rgba(137, 108, 255, 0.72);
+}
+
+.rocket-bet-custom input:disabled {
+  opacity: 0.5;
+}
+
+.rocket-bet-custom input::-webkit-inner-spin-button,
+.rocket-bet-custom input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.rocket-bet-custom span {
+  color: #f0eaff;
+  font: inherit;
+}
+
 .rocket-bet-controls {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
