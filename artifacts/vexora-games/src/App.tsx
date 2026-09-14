@@ -10,7 +10,6 @@ import {
   Gamepad2,
   Zap,
   TrendingUp,
-  Diamond,
   User,
   Star,
   Users,
@@ -74,22 +73,26 @@ function HubView() {
   return (
     <div className="flex flex-col gap-4 pb-24 pt-2 px-4 animate-pop-in">
       
-      {/* VEX Header */}
+      {/* TON Header */}
       <div className="flex items-center justify-between glass-panel rounded-2xl p-3">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-            <Diamond className="text-primary" size={20} />
+          <div className="h-10 w-10 rounded-full overflow-hidden border border-sky-400/40 shadow-[0_0_14px_rgba(0,152,219,0.25)]">
+            <img
+              src={`${import.meta.env.BASE_URL}assets/ton-coin.webp`}
+              alt="TON"
+              className="h-full w-full object-cover"
+            />
           </div>
           <div>
             <p className="text-[0.65rem] text-muted-foreground uppercase tracking-wider font-mono">Ваши очки</p>
-            <p className="font-bold text-lg leading-tight">{balance.toLocaleString()} <span className="text-primary text-sm">VEX</span></p>
+            <p className="font-bold text-lg leading-tight">{balance.toLocaleString()} <span className="text-sky-400 text-sm">TON</span></p>
           </div>
         </div>
         <button 
-          onClick={() => toast({ description: 'VEX-очки появятся после запуска.' })}
-          className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
+          onClick={() => toast({ description: 'TON появятся после запуска.' })}
+          className="bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
         >
-          О VEX
+          О TON
         </button>
       </div>
 

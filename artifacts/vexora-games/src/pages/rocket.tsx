@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Coins, UserRound } from 'lucide-react';
+import { ArrowLeft, UserRound } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 type Phase = 'betting' | 'flying' | 'crashed';
@@ -207,9 +207,9 @@ export default function RocketGame() {
     phase === 'betting'
       ? activeBet === null
         ? 'Сделать ставку'
-        : `Ставка ${activeBet} VEX принята`
+        : `Ставка ${activeBet} TON принята`
       : phase === 'flying' && activeBet !== null
-        ? `Забрать ${(activeBet * multiplier).toFixed(0)} VEX`
+        ? `Забрать ${(activeBet * multiplier).toFixed(0)} TON`
         : phase === 'crashed'
           ? 'Раунд завершён'
           : 'Ожидание нового раунда';
@@ -225,8 +225,8 @@ export default function RocketGame() {
           <span>Vexora Games</span>
         </div>
         <div className="rocket-balance">
-          <Coins size={15} />
-          {balance.toLocaleString()} VEX
+          <img src={`${import.meta.env.BASE_URL}assets/ton-coin.webp`} alt="" />
+          {balance.toLocaleString()} TON
         </div>
       </header>
 
@@ -312,9 +312,9 @@ export default function RocketGame() {
                   setBetAmount(Number.isFinite(nextAmount) ? Math.max(0, nextAmount) : 0);
                 }}
                 disabled={phase !== 'betting' || activeBet !== null}
-                aria-label="Сумма ставки VEX"
+                aria-label="Сумма ставки TON"
               />
-              <span>VEX</span>
+              <span>TON</span>
             </label>
           </div>
           <div className="rocket-bet-controls">
@@ -355,14 +355,14 @@ export default function RocketGame() {
           {activeBet !== null && (
             <div className="rocket-participant is-you">
               <span className="rocket-avatar"><UserRound size={17} /></span>
-              <span><strong>Вы</strong><small>{activeBet} VEX</small></span>
+              <span><strong>Вы</strong><small>{activeBet} TON</small></span>
               <em>{cashedOutAt ? `${cashedOutAt.toFixed(2)}x` : 'В игре'}</em>
             </div>
           )}
           {MOCK_PARTICIPANTS.map((participant) => (
             <div className="rocket-participant" key={participant.id}>
               <span className="rocket-avatar"><UserRound size={17} /></span>
-              <span><strong>{participant.name}</strong><small>{participant.amount} VEX</small></span>
+              <span><strong>{participant.name}</strong><small>{participant.amount} TON</small></span>
               <em>{participant.multiplier ? `${participant.multiplier.toFixed(2)}x` : 'В игре'}</em>
             </div>
           ))}
