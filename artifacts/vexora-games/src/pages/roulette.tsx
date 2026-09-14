@@ -1,16 +1,24 @@
 import { useMemo, useRef, useState } from 'react';
-import { ArrowLeft, CircleDot, Gift, Gem, Sparkles, Star, Trophy } from 'lucide-react';
+import { ArrowLeft, CircleDot, Gem, Sparkles, Star } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 const ITEM_WIDTH = 126;
 const ITEM_GAP = 16;
 
 const PLACEHOLDER_ITEMS = [
-  { id: 'gift', label: 'Gift', icon: Gift, tone: 'pink' },
-  { id: 'gem', label: 'Gem', icon: Gem, tone: 'violet' },
+  { id: 'ton', label: 'TON', icon: Gem, tone: 'violet' },
   { id: 'star', label: 'Star', icon: Star, tone: 'blue' },
-  { id: 'trophy', label: 'Trophy', icon: Trophy, tone: 'gold' },
-] as const;
+  { id: 'plush-pepe', label: 'Plush Pepe', video: 'plush-pepe.mp4', tone: 'gold' },
+  { id: 'snoop-silver', label: 'Snoop Dogg', video: 'snoop-dogg-silver.mp4', tone: 'gold' },
+  { id: 'snoop-sport', label: 'Snoop Dogg', video: 'snoop-dogg-sport.mp4', tone: 'blue' },
+  { id: 'mood-pack', label: 'Mood Pack', video: 'mood-pack.mp4', tone: 'pink' },
+  { id: 'cupid-skull', label: 'Cupid Charm', video: 'cupid-charm-skull.mp4', tone: 'blue' },
+  { id: 'cupid-jewels', label: 'Cupid Charm', video: 'cupid-charm-jewels.mp4', tone: 'pink' },
+  { id: 'toy-bear', label: 'Toy Bear', video: 'toy-bear.mp4', tone: 'violet' },
+  { id: 'sharp-tongue', label: 'Sharp Tongue', video: 'sharp-tongue.mp4', tone: 'violet' },
+  { id: 'scared-cat', label: 'Scared Cat', video: 'scared-cat.mp4', tone: 'blue' },
+  { id: 'mighty-arm', label: 'Mighty Arm', video: 'mighty-arm.mp4', tone: 'gold' },
+];
 
 export default function RouletteGame() {
   const [, setLocation] = useLocation();
@@ -24,7 +32,7 @@ export default function RouletteGame() {
   });
 
   const reelItems = useMemo(
-    () => Array.from({ length: 28 }, (_, index) => ({
+    () => Array.from({ length: 48 }, (_, index) => ({
       ...PLACEHOLDER_ITEMS[index % PLACEHOLDER_ITEMS.length],
       reelId: `${index}-${PLACEHOLDER_ITEMS[index % PLACEHOLDER_ITEMS.length].id}`,
     })),
@@ -92,11 +100,25 @@ export default function RouletteGame() {
           </div>
           <div ref={viewportRef} className="roulette-viewport">
             <div ref={trackRef} className="roulette-track">
-              {reelItems.map(({ reelId, label, icon: Icon, tone }) => (
+              {reelItems.map(({ reelId, label, icon: Icon, video, tone }) => (
                 <div className={`roulette-item tone-${tone}`} key={reelId}>
                   <div className="roulette-item-art">
-                    <Icon size={58} strokeWidth={1.7} />
-                    <Sparkles className="roulette-item-spark" size={20} />
+                    {video ? (
+                      <video
+                        src={`${import.meta.env.BASE_URL}assets/roulette-gifts/${video}`}
+                        poster={`${import.meta.env.BASE_URL}assets/roulette-gifts/${video.replace('.mp4', '.jpg')}`}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        aria-label={label}
+                      />
+                    ) : (
+                      <>
+                        {Icon && <Icon size={58} strokeWidth={1.7} />}
+                        <Sparkles className="roulette-item-spark" size={20} />
+                      </>
+                    )}
                   </div>
                   <span>{label}</span>
                 </div>
@@ -119,7 +141,7 @@ export default function RouletteGame() {
           >
             {isSpinning ? 'Крутится…' : balance < 1 ? 'Недостаточно TON' : 'Крутить за 1 TON'}
           </button>
-          <p>Призы будут добавлены следующим этапом</p>
+          <p>Star, TON и коллекционные NFT-подарки</p>
         </section>
       </main>
     </div>
